@@ -26,7 +26,7 @@
                     </button>
                     <button class="btn btn-primary" @click="vote" :disabled="hasVoted">Vote!</button>
                 </div>
-                <div class="showoff" v-show="hasVoted && (joined.length === votes.length) && votesData.length">
+                <div class="showoff" v-show="votesData.length">
                     <div class="row mb-5">
                         <div class="col-3 col-lg-2 col-xl-2" v-for="(vote, index) in votesData" :key="'vote-'+index">
                             <div class="card p-2">
@@ -35,7 +35,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary snap-bottom" @click="next">Next!</button>
+                    <button class="btn btn-primary snap-bottom" @click="next" :disabled="session.round_id != sync_round">Next!</button>
                 </div>
             </div>
         </div>

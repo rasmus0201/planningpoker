@@ -39,7 +39,7 @@ class JoinListener extends Listener
             'UPDATE users SET resourceId = :resourceId, round_id = :round_id, clientId = :clientId, connected = 1 WHERE username = :username',
             [
                 ':resourceId' => $this->event->getPublisher()->resourceId,
-                ':round_id' => $currentRound,
+                ':round_id' => (int) $currentRound,
                 ':clientId' => $clientId,
                 ':username' => $user['username'],
             ]
@@ -54,7 +54,7 @@ class JoinListener extends Listener
             LEFT JOIN users u ON u.id = v.user_id
             WHERE v.round_id = :round_id
         ", [
-            ':round_id' => $currentRound,
+            ':round_id' => (int) $currentRound,
         ])->fetchAll(\PDO::FETCH_ASSOC);
 
         $this->event->sendPublisher([
@@ -63,7 +63,7 @@ class JoinListener extends Listener
                 'session' => [
                     'clientId' => $clientId,
                     'username' => $user['username'],
-                    'round_id' => $currentRound,
+                    'round_id' => (int) $currentRound,
                     'auth' => true,
                 ],
                 'joined' => array_filter(array_unique(array_column($users, 'username'))),

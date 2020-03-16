@@ -14,6 +14,7 @@ const app = new Vue({
                 auth: false,
                 round_id: null,
             },
+            sync_round: null,
             chosenCard: null, // What card did the user choose
             votes: [], // Which users have voted
             votesData: [], // Which users voted what
@@ -123,6 +124,8 @@ const app = new Vue({
 
             this.send('vote', {
                 clientId: this.session.clientId,
+                username: this.session.username,
+                round_id: this.session.round_id,
                 vote: this.chosenCard,
             });
 
@@ -157,18 +160,25 @@ const app = new Vue({
                     break;
                 case 'login':
                     this.session = data.session;
+                    this.sync_round = data.session.round_id;
                     this.joined = data.joined;
                     this.votes = data.votes;
                     break;
                 case 'join':
                     if (this.joined.indexOf(data.username) === -1) {
                         this.joined.push(data.username);
+                        this.session.round_id = data.round_id;
+                        this.sync_round = data.round_id;
                     }
                     break;
                 case 'vote':
                     if (this.votes.indexOf(data.username) === -1) {
                         this.votes.push(data.username);
                     }
+                    break;
+                case 'finish':
+                    console.log(data);
+                    this.sync_round = data.round_id;
                     break;
                 case 'showoff':
                     this.votesData = data;

@@ -15,8 +15,6 @@ class FinishListener extends Listener
     {
         $clientId = $this->event->data['data']['clientId'] ?? '';
 
-        var_dump($clientId);
-
         if (!$clientId) {
             return;
         }
@@ -30,34 +28,37 @@ class FinishListener extends Listener
             return;
         }
 
-        var_dump($user);
+        Database::run('DELETE FROM votes WHERE user_id = :user_id AND round_id = :round_id',
+            [
+                ':user_id' => $user['id'],
+                ':round_id' => (int) $user['round_id']
+            ]
+        );
 
-        Database::run('DELETE FROM votes WHERE user_id = :user_id AND round_id = :round_id', [':user_id' => $user['id'], ':round_id' => $user['round_id']]);
-
-        $user['round_id']++;
+        $nextRound = ((int) $user['round_id']) + 1;
 
         Database::run(
             'UPDATE users SET round_id = :round_id WHERE id = :id',
             [
-                ':round_id' => $user['round_id'],
+                ':round_id' => $nextRound,
                 ':id' => $user['id']
             ]
         );
 
-        $stmt = Database::run('SELECT COUNT(*) as count FROM votes WHERE round_id = :last_round_id', [':last_round_id', ($user['round_id'] - 1)]);
+        $stmt = Database::run('SELECT COUNT(*) as count FROM votes WHERE round_id = :last_round_id', [':last_round_id' => $user['round_id']]);
         if (( (int)$stmt->fetch(\PDO::FETCH_ASSOC)['count'] ) === 0) {
-            $this->sendPublisher([
+            $this->event->sendPublisher([
                 'type' => 'finish',
                 'data' => [
-                    'round_id' => $user['round_id'],
+                    'round_id' => (int) $nextRound,
                     'message' => 'Round finished, all moved to next round'
                 ]
             ]);
 
-            $this->sendSubscribers([
+            $this->event->sendSubscribers([
                 'type' => 'finish',
                 'data' => [
-                    'round_id' => $user['round_id'],
+                    'round_id' => (int) $nextRound,
                     'message' => 'Round finished, all moved to next round'
                 ]
             ]);

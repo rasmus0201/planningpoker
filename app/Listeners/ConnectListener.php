@@ -54,6 +54,7 @@ class ConnectListener extends Listener
                         'session' => [
                             'clientId' => $clientId,
                             'username' => $user['username'],
+                            'round_id' => (int) $currentRound,
                             'auth' => true,
                         ],
                         'joined' => array_filter(array_unique(array_column($users, 'username'))),
