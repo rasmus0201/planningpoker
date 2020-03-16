@@ -1,0 +1,7 @@
+Goal: Planning poker with Kahoot-like interface
+
+1. √ Connect x clients (choose name first)
+2. √ Choose what card you want to throw
+3. "Finish" (either all finishes, or an action "finish round" i taken)
+4. Reveal answers with the name on the card
+5. Next round
