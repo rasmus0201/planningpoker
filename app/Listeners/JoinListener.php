@@ -36,7 +36,7 @@ class JoinListener extends Listener
         }
 
         Database::run(
-            'UPDATE users SET resourceId = :resourceId, :round_id = :round_id, clientId = :clientId, connected = 1 WHERE username = :username',
+            'UPDATE users SET resourceId = :resourceId, round_id = :round_id, clientId = :clientId, connected = 1 WHERE username = :username',
             [
                 ':resourceId' => $this->event->getPublisher()->resourceId,
                 ':round_id' => $currentRound,
@@ -52,7 +52,10 @@ class JoinListener extends Listener
 
         $votes = Database::run("SELECT u.username FROM votes v
             LEFT JOIN users u ON u.id = v.user_id
-        ")->fetchAll(\PDO::FETCH_ASSOC);
+            WHERE v.round_id = :round_id
+        ", [
+            ':round_id' => $currentRound,
+        ])->fetchAll(\PDO::FETCH_ASSOC);
 
         $this->event->sendPublisher([
             'type' => 'login',

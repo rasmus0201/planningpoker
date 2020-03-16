@@ -15,6 +15,8 @@ class FinishListener extends Listener
     {
         $clientId = $this->event->data['data']['clientId'] ?? '';
 
+        var_dump($clientId);
+
         if (!$clientId) {
             return;
         }
@@ -28,19 +30,21 @@ class FinishListener extends Listener
             return;
         }
 
+        var_dump($user);
+
+        Database::run('DELETE FROM votes WHERE user_id = :user_id AND round_id = :round_id', [':user_id' => $user['id'], ':round_id' => $user['round_id']]);
+
         $user['round_id']++;
 
-        Database::run('DELETE FROM votes WHERE user_id = :user_id', [':user_id' => $user['id']]);
-
         Database::run(
-            'UPDATE users SET :round_id = :round_id WHERE id = :id',
+            'UPDATE users SET round_id = :round_id WHERE id = :id',
             [
                 ':round_id' => $user['round_id'],
                 ':id' => $user['id']
             ]
         );
 
-        $stmt = Database::run('SELECT COUNT(*) as count FROM votes');
+        $stmt = Database::run('SELECT COUNT(*) as count FROM votes WHERE round_id = :last_round_id', [':last_round_id', ($user['round_id'] - 1)]);
         if (( (int)$stmt->fetch(\PDO::FETCH_ASSOC)['count'] ) === 0) {
             $this->sendPublisher([
                 'type' => 'finish',
