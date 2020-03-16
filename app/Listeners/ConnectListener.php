@@ -22,9 +22,18 @@ class ConnectListener extends Listener
             );
 
             if ($user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $currentRound = Database::run('SELECT round_id FROM users ORDER BY round_id DESC LIMIT 1')->fetch(\PDO::FETCH_ASSOC)['round_id'];
+                if ($currentRound === null) {
+                    $currentRound = 0;
+                }
+
                 Database::run(
-                    'UPDATE users SET connected = 1 WHERE id = :id',
-                    [':id' => $user['id']]
+                    'UPDATE users SET resourceId = :resourceId, :round_id = :round_id, connected = 1 WHERE id = :id',
+                    [
+                        ':resourceId' => $this->event->getPublisher()->resourceId,
+                        ':round_id' => $currentRound,
+                        ':id' => $user['id']
+                    ]
                 );
 
                 $users = Database::run(
@@ -44,10 +53,12 @@ class ConnectListener extends Listener
                             'username' => $user['username'],
                             'auth' => true,
                         ],
-                        'joined' => array_column($users, 'username'),
-                        'votes' => array_column($votes, 'username'),
+                        'joined' => array_filter(array_unique(array_column($users, 'username'))),
+                        'votes' => array_filter(array_unique(array_column($votes, 'username'))),
                     ]
                 ]);
+
+                $this->sendShowoffIfAllVoted();
 
                 $this->event->sendSubscribers([
                     'type' => 'join',
@@ -55,15 +66,13 @@ class ConnectListener extends Listener
                         'username' => $user['username'],
                     ]
                 ]);
-
-                return;
             }
         }
 
-        $this->publishUsers();
+        $this->publishAvailableUsers();
     }
 
-    private function publishUsers()
+    private function publishAvailableUsers()
     {
         $stmt = Database::run(
             'SELECT username FROM users WHERE connected = :connected',
@@ -72,11 +81,38 @@ class ConnectListener extends Listener
 
         $users = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'username');
 
-        $this->event->getPublisher()->send(json_encode([
+        $this->event->sendPublisher([
             'type' => 'users',
             'data' => [
-                'users' => $users,
+                'users' => array_filter(array_unique($users)),
             ],
-        ]));
+        ]);
+
+        $this->event->sendSubscribers([
+            'type' => 'users',
+            'data' => [
+                'users' => array_filter(array_unique($users)),
+            ],
+        ]);
+    }
+
+    private function sendShowoffIfAllVoted()
+    {
+        // Check if last vote, if so send the answers.
+        $countConnectedUsers = Database::run("SELECT COUNT(*) as count FROM users WHERE connected = 1 AND clientId IS NOT NULL")->fetch(\PDO::FETCH_ASSOC);
+        $votes = Database::run("SELECT u.username, v.vote_id FROM votes v
+            INNER JOIN users u ON u.id = v.user_id
+            WHERE u.connected = 1
+            AND u.clientId IS NOT NULL
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (((int) $countConnectedUsers['count']) !== count($votes)) {
+            return;
+        }
+
+        $this->event->sendPublisher([
+            'type' => 'showoff',
+            'data' => $votes
+        ]);
     }
 }

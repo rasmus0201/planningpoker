@@ -19,16 +19,23 @@
                     <button @click="join" class="btn btn-primary">Ok!</button>
                 </div>
             </div>
-            <div class="auth" v-if="session.auth">
+            <div class="auth my-3 mx-3" v-if="session.auth">
                 <div class="vote" v-show="!hasVoted || (joined.length !== votes.length)">
                     <button :disabled="hasVoted" class="btn btn-outline-dark mr-2" :class="{ 'active' : chosenCard === index }" @click="select(card)" v-for="(card, index) in cards" :key="'card-'+index">
                         {{ card.value }}
                     </button>
                     <button class="btn btn-primary" @click="vote" :disabled="hasVoted">Vote!</button>
                 </div>
-                <div class="look" v-show="hasVoted && (joined.length === votes.length)">
-                    Show all votes
-                    <button class="btn btn-primary" @click="next">Next!</button>
+                <div class="showoff" v-show="hasVoted && (joined.length === votes.length) && votesData.length">
+                    <div class="row mb-5">
+                        <div class="col-3 col-lg-2 col-xl-2" v-for="(vote, index) in votesData" :key="'vote-'+index">
+                            <div class="card p-2">
+                                <h5 class="card-title text-uppercase">{{ vote.username }}</h5>
+                                <p class="card-text">Voted: <strong>{{ cards[vote.vote_id].value }}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary snap-bottom" @click="next">Next!</button>
                 </div>
             </div>
         </div>

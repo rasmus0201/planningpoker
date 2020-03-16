@@ -30,9 +30,16 @@ class JoinListener extends Listener
             return;
         }
 
+        $currentRound = Database::run('SELECT round_id FROM users ORDER BY round_id DESC LIMIT 1')->fetch(\PDO::FETCH_ASSOC)['round_id'];
+        if ($currentRound === null) {
+            $currentRound = 0;
+        }
+
         Database::run(
-            'UPDATE users SET connected = 1, clientId = :clientId WHERE username = :username',
+            'UPDATE users SET resourceId = :resourceId, :round_id = :round_id, clientId = :clientId, connected = 1 WHERE username = :username',
             [
+                ':resourceId' => $this->event->getPublisher()->resourceId,
+                ':round_id' => $currentRound,
                 ':clientId' => $clientId,
                 ':username' => $user['username'],
             ]
@@ -53,10 +60,11 @@ class JoinListener extends Listener
                 'session' => [
                     'clientId' => $clientId,
                     'username' => $user['username'],
+                    'round_id' => $currentRound,
                     'auth' => true,
                 ],
-                'joined' => array_column($users, 'username'),
-                'votes' => array_column($votes, 'username'),
+                'joined' => array_filter(array_unique(array_column($users, 'username'))),
+                'votes' => array_filter(array_unique(array_column($votes, 'username'))),
             ]
         ]);
 
@@ -65,6 +73,32 @@ class JoinListener extends Listener
             'data' => [
                 'username' => $user['username'],
             ]
+        ]);
+
+        $this->publishAvailableUsers();
+    }
+
+    private function publishAvailableUsers()
+    {
+        $stmt = Database::run(
+            'SELECT username FROM users WHERE connected = :connected',
+            [':connected' => 0]
+        );
+
+        $users = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'username');
+
+        $this->event->sendPublisher([
+            'type' => 'users',
+            'data' => [
+                'users' => array_filter(array_unique($users)),
+            ],
+        ]);
+
+        $this->event->sendSubscribers([
+            'type' => 'users',
+            'data' => [
+                'users' => array_filter(array_unique($users)),
+            ],
         ]);
     }
 }

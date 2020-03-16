@@ -5,3 +5,8 @@ Goal: Planning poker with Kahoot-like interface
 3. "Finish" (either all finishes, or an action "finish round" i taken)
 4. Reveal answers with the name on the card
 5. Next round
+
+
+#### Bugs
+
+* Once voted if refresh you won't see your vote.

@@ -14,9 +14,9 @@ class VoteListener extends Listener
     public function handle()
     {
         $stmt = Database::run(
-            'SELECT * FROM users WHERE username = :username LIMIT 1',
+            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
             [
-                ':username' => $this->event->data['data']['username'] ?? ''
+                ':clientId' => $this->event->data['data']['clientId'] ?? ''
             ]
         );
 
@@ -34,6 +34,33 @@ class VoteListener extends Listener
             'data' => [
                 'username' => $this->event->data['data']['username'] ?? '',
             ]
+        ]);
+
+        $this->sendShowoffIfAllVoted();
+    }
+
+    private function sendShowoffIfAllVoted()
+    {
+        // Check if last vote, if so send the answers.
+        $countConnectedUsers = Database::run("SELECT COUNT(*) as count FROM users WHERE connected = 1 AND clientId IS NOT NULL")->fetch(\PDO::FETCH_ASSOC);
+        $votes = Database::run("SELECT u.username, v.vote_id FROM votes v
+            INNER JOIN users u ON u.id = v.user_id
+            WHERE u.connected = 1
+            AND u.clientId IS NOT NULL
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (((int) $countConnectedUsers['count']) !== count($votes)) {
+            return;
+        }
+
+        $this->event->sendPublisher([
+            'type' => 'showoff',
+            'data' => $votes
+        ]);
+
+        $this->event->sendSubscribers([
+            'type' => 'showoff',
+            'data' => $votes
         ]);
     }
 }

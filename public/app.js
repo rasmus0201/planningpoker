@@ -12,61 +12,50 @@ const app = new Vue({
                 clientId: '',
                 username: '',
                 auth: false,
+                round_id: null,
             },
-            chosenCard: null,
-            votes: [],
+            chosenCard: null, // What card did the user choose
+            votes: [], // Which users have voted
+            votesData: [], // Which users voted what
             cards: [
                 {
                     value: '0',
-                    votes: [],
                 },
                 {
                     value: '0.5',
-                    votes: [],
                 },
                 {
                     value: '1',
-                    votes: [],
                 },
                 {
                     value: '2',
-                    votes: [],
                 },
                 {
                     value: '3',
-                    votes: [],
                 },
                 {
                     value: '5',
-                    votes: [],
                 },
                 {
                     value: '8',
-                    votes: [],
                 },
                 {
                     value: '13',
-                    votes: [],
                 },
                 {
                     value: '20',
-                    votes: [],
                 },
                 {
                     value: '40',
-                    votes: [],
                 },
                 {
                     value: '100',
-                    votes: [],
                 },
                 {
                     value: '?',
-                    votes: [],
                 },
                 {
                     value: '☕️',
-                    votes: [],
                 },
             ]
         }
@@ -89,6 +78,11 @@ const app = new Vue({
         this.session.clientId = clientId;
 
         this.openSocket();
+
+        const lastVoteIndex = window.localStorage.getItem('lastVoteIndex');
+        if (lastVoteIndex !== null && lastVoteIndex !== 'undefined' && lastVoteIndex >= 0) {
+            this.chosenCard = lastVoteIndex;
+        }
     },
 
     methods: {
@@ -128,15 +122,24 @@ const app = new Vue({
             }
 
             this.send('vote', {
-                username: this.session.username,
+                clientId: this.session.clientId,
                 vote: this.chosenCard,
             });
+
+            window.localStorage.setItem('lastVoteIndex', this.chosenCard);
 
             this.votes.push(this.session.username);
         },
 
         next() {
+            // Remove votes data
+            this.chosenCard = null;
+            this.votes = [];
+            this.votesData = [];
+            window.localStorage.setItem('lastVoteIndex', null);
 
+            // Send next/"remove vote" message
+            this.send('finish', this.session);
         },
 
         onOpen(e) {
@@ -166,6 +169,9 @@ const app = new Vue({
                     if (this.votes.indexOf(data.username) === -1) {
                         this.votes.push(data.username);
                     }
+                    break;
+                case 'showoff':
+                    this.votesData = data;
                     break;
             }
         },

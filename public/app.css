@@ -27,6 +27,22 @@ html {
     }
 }
 
+.btn-outline-dark.active:disabled,
+.btn-outline-dark.active.disabled {
+    opacity: 0.65;
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.snap-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 0;
+}
 
 .login {
     width: 100vw;
@@ -40,12 +56,4 @@ html {
     flex: 1 0 auto;
     animation: 14s ease 0s infinite alternate none running bgcolor;
     padding: 0px 0.625rem;
-}
-
-.btn-outline-dark.active:disabled,
-.btn-outline-dark.active.disabled {
-    opacity: 0.65;
-    color: #fff;
-    background-color: #343a40;
-    border-color: #343a40;
 }
