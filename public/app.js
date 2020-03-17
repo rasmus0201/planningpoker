@@ -86,6 +86,20 @@ const app = new Vue({
     },
 
     methods: {
+        startAudio() {
+            if (this.$refs['audio']) {
+                this.$refs['audio'].currentTime = 0;
+                this.$refs['audio'].play();
+            }
+        },
+
+        stopAudio() {
+            if (this.$refs['audio']) {
+                this.$refs['audio'].pause();
+                this.$refs['audio'].currentTime = 0;
+            }
+        },
+        
         openSocket() {
             this.connection = new WebSocket(window.PLANNINGPOKER.websocketUrl);
 
@@ -130,9 +144,13 @@ const app = new Vue({
             window.localStorage.setItem('lastVoteIndex', this.chosenCard);
 
             this.votes.push(this.session.username);
+
+            this.startAudio();
         },
 
         next() {
+            this.startAudio();
+            
             // Remove votes data
             this.chosenCard = null;
             this.votes = [];
@@ -140,7 +158,7 @@ const app = new Vue({
             window.localStorage.setItem('lastVoteIndex', null);
 
             this.pendingSync = true;
-
+           
             // Send next/"remove vote" message
             this.send('advance', this.session);
         },
@@ -182,10 +200,14 @@ const app = new Vue({
                     this.votes = [];
                     this.votesData = [];
                     window.localStorage.setItem('lastVoteIndex', null);
+
+                    this.stopAudio();
                     
                     break;
                 case 'showoff':
                     this.votesData = data;
+                    
+                    this.stopAudio();
                     break;
             }
         },
