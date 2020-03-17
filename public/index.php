@@ -1,3 +1,11 @@
+<?php
+$websocketMap = [
+    '127.0.0.1' => 'ws://localhost:9000',
+    '165.227.174.67' => 'ws://planningpoker.rasmusbundsgaard.dk/websocket',
+];
+
+$websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocketMap[$_SERVER['SERVER_ADDR']] : $websocketMap['127.0.0.1']; 
+?>
 <!DOCTYPE html>
 <html lang="da" dir="ltr">
     <head>
@@ -5,6 +13,11 @@
         <title>Planning Poker</title>
         <link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="app.css">
+        <script>
+            window.PLANNINGPOKER = {
+                websocketUrl: "<?php echo $websocketConnection; ?>",
+            };
+        </script>
     </head>
     <body>
         <div id="app">

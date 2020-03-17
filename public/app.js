@@ -87,7 +87,7 @@ const app = new Vue({
 
     methods: {
         openSocket() {
-            this.connection = new WebSocket('ws://localhost:9000');
+            this.connection = new WebSocket(window.PLANNINGPOKER.websocketUrl);
 
             this.connection.onopen = this.onOpen;
             this.connection.onmessage = this.onMessage;
