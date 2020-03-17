@@ -8,7 +8,7 @@
     </head>
     <body>
         <div id="app">
-            <div class="login" v-if="!session.auth">
+            <div class="login animated-bg" v-if="!session.auth">
                 <div class="d-flex">
                     <select class="form-control mr-2" v-model="session.username" :disabled="availableUsers.length === 0">
                         <option value="">Vælg bruger</option>
@@ -19,7 +19,10 @@
                     <button @click="join" class="btn btn-primary">Ok!</button>
                 </div>
             </div>
-            <div class="auth my-3 mx-3" v-if="session.auth">
+            <div class="waiting animated-bg" v-if="session.auth && pendingSync">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+            <div class="play my-3 mx-3" v-if="session.auth && !pendingSync">
                 <div class="vote" v-show="!hasVoted || (joined.length !== votes.length)">
                     <button :disabled="hasVoted" class="btn btn-outline-dark mr-2" :class="{ 'active' : chosenCard === index }" @click="select(card)" v-for="(card, index) in cards" :key="'card-'+index">
                         {{ card.value }}
@@ -35,7 +38,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary snap-bottom" @click="next" :disabled="session.round_id != sync_round">Next!</button>
+                    <button class="btn btn-primary snap-bottom" @click="next">Next!</button>
                 </div>
             </div>
         </div>

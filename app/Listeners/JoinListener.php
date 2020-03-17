@@ -30,16 +30,11 @@ class JoinListener extends Listener
             return;
         }
 
-        $currentRound = Database::run('SELECT round_id FROM users ORDER BY round_id DESC LIMIT 1')->fetch(\PDO::FETCH_ASSOC)['round_id'];
-        if ($currentRound === null) {
-            $currentRound = 0;
-        }
-
         Database::run(
-            'UPDATE users SET resourceId = :resourceId, round_id = :round_id, clientId = :clientId, connected = 1 WHERE username = :username',
+            'UPDATE users SET resourceId = :resourceId, advanced = :advanced, clientId = :clientId, connected = 1 WHERE username = :username',
             [
                 ':resourceId' => $this->event->getPublisher()->resourceId,
-                ':round_id' => (int) $currentRound,
+                ':advanced' => 0,
                 ':clientId' => $clientId,
                 ':username' => $user['username'],
             ]
@@ -52,10 +47,7 @@ class JoinListener extends Listener
 
         $votes = Database::run("SELECT u.username FROM votes v
             LEFT JOIN users u ON u.id = v.user_id
-            WHERE v.round_id = :round_id
-        ", [
-            ':round_id' => (int) $currentRound,
-        ])->fetchAll(\PDO::FETCH_ASSOC);
+        ")->fetchAll(\PDO::FETCH_ASSOC);
 
         $this->event->sendPublisher([
             'type' => 'login',
@@ -63,7 +55,7 @@ class JoinListener extends Listener
                 'session' => [
                     'clientId' => $clientId,
                     'username' => $user['username'],
-                    'round_id' => (int) $currentRound,
+                    'advanced' => 0,
                     'auth' => true,
                 ],
                 'joined' => array_filter(array_unique(array_column($users, 'username'))),

@@ -12,9 +12,8 @@ const app = new Vue({
                 clientId: '',
                 username: '',
                 auth: false,
-                round_id: null,
             },
-            sync_round: null,
+            pendingSync: false,
             chosenCard: null, // What card did the user choose
             votes: [], // Which users have voted
             votesData: [], // Which users voted what
@@ -81,8 +80,8 @@ const app = new Vue({
         this.openSocket();
 
         const lastVoteIndex = window.localStorage.getItem('lastVoteIndex');
-        if (lastVoteIndex !== null && lastVoteIndex !== 'undefined' && lastVoteIndex >= 0) {
-            this.chosenCard = lastVoteIndex;
+        if (lastVoteIndex !== null && lastVoteIndex !== 'undefined' && parseInt(lastVoteIndex) >= 0) {
+            this.chosenCard = parseInt(lastVoteIndex);
         }
     },
 
@@ -125,7 +124,6 @@ const app = new Vue({
             this.send('vote', {
                 clientId: this.session.clientId,
                 username: this.session.username,
-                round_id: this.session.round_id,
                 vote: this.chosenCard,
             });
 
@@ -141,8 +139,10 @@ const app = new Vue({
             this.votesData = [];
             window.localStorage.setItem('lastVoteIndex', null);
 
+            this.pendingSync = true;
+
             // Send next/"remove vote" message
-            this.send('finish', this.session);
+            this.send('advance', this.session);
         },
 
         onOpen(e) {
@@ -160,15 +160,13 @@ const app = new Vue({
                     break;
                 case 'login':
                     this.session = data.session;
-                    this.sync_round = data.session.round_id;
+                    this.pendingSync = (parseInt(data.session.advanced) !== 0);
                     this.joined = data.joined;
                     this.votes = data.votes;
                     break;
                 case 'join':
                     if (this.joined.indexOf(data.username) === -1) {
                         this.joined.push(data.username);
-                        this.session.round_id = data.round_id;
-                        this.sync_round = data.round_id;
                     }
                     break;
                 case 'vote':
@@ -177,8 +175,14 @@ const app = new Vue({
                     }
                     break;
                 case 'finish':
-                    console.log(data);
-                    this.sync_round = data.round_id;
+                    this.pendingSync = false;
+                    
+                    // Remove votes data
+                    this.chosenCard = null;
+                    this.votes = [];
+                    this.votesData = [];
+                    window.localStorage.setItem('lastVoteIndex', null);
+                    
                     break;
                 case 'showoff':
                     this.votesData = data;

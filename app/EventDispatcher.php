@@ -28,8 +28,6 @@ class EventDispatcher
                 continue;
             }
 
-            echo 'Dispatching: '.$class.' => '.get_class($listener).PHP_EOL;
-
             $returns = $listener->handle();
 
             // Check if we should continue to call listeners

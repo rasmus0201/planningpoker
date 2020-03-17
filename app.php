@@ -14,7 +14,7 @@ $listeners = [
         'App\Listeners\ConnectListener',
         'App\Listeners\JoinListener',
         'App\Listeners\VoteListener',
-        'App\Listeners\FinishListener',
+        'App\Listeners\AdvanceListener',
     ],
     'App\Events\CloseEvent' => [
         'App\Listeners\CloseListener',

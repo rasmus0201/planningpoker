@@ -39,15 +39,14 @@ class Database
             $this->dbh->exec("CREATE TABLE IF NOT EXISTS votes (
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER NOT NULL,
-                vote_id INTEGER NOT NULL,
-                round_id INTEGER NOT NULL
+                vote_id INTEGER NOT NULL
             )");
 
             $this->dbh->exec("CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY,
                 clientId TEXT,
                 resourceId TEXT,
-                round_id INTEGER,
+                advanced INTEGER DEFAULT 0,
                 username TEXT NOT NULL UNIQUE,
                 connected INTEGER
             )");
