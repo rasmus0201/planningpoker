@@ -71,7 +71,7 @@ const app = new Vue({
         let clientId = window.localStorage.getItem('clientId');
 
         if (!clientId) {
-            let clientId = Math.random().toString(36).substring(2);
+            clientId = Math.random().toString(36).substring(2);
             window.localStorage.setItem('clientId', clientId);
         }
 
