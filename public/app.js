@@ -5,6 +5,7 @@ const app = new Vue({
 
     data() {
         return {
+            muted: false,
             conn: null,
             availableUsers: [],
             joined: [],
@@ -87,7 +88,7 @@ const app = new Vue({
 
     methods: {
         startAudio() {
-            if (this.$refs['audio']) {
+            if (this.$refs['audio'] && this.muted === false) {
                 this.$refs['audio'].currentTime = 0;
                 this.$refs['audio'].play();
             }
@@ -97,6 +98,18 @@ const app = new Vue({
             if (this.$refs['audio']) {
                 this.$refs['audio'].pause();
                 this.$refs['audio'].currentTime = 0;
+            }
+        },
+
+        muteAudio() {
+            if (this.$refs['audio'] && !this.$refs['audio'].paused) {
+                this.stopAudio();
+            }
+ 
+            this.muted = !this.muted;
+
+            if (this.muted === false && (this.pendingSync || (this.hasVoted && !this.votesData.length))) {
+                this.startAudio();
             }
         },
         

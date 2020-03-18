@@ -129,6 +129,27 @@ html {
     padding: 0px 0.625rem;
 }
 
+.mute-audio {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background-color: rgb(69, 163, 229);
+    color: #fff;
+    border-radius: 100%;
+    padding: 10px;
+    display: flex;
+    cursor: pointer;
+}
+
+.mute-audio svg {
+    width: 20px;
+    height: 20px;
+}
+
+.login select.form-control {
+    width: 125px;
+}
+
 .pcard {
     position: relative;
     display: inline-block;
