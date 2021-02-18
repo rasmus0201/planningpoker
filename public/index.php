@@ -4,7 +4,7 @@ $websocketMap = [
     '165.227.174.67' => 'ws://planningpoker.rasmusbundsgaard.dk/websocket',
 ];
 
-$websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocketMap[$_SERVER['SERVER_ADDR']] : $websocketMap['127.0.0.1']; 
+$websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocketMap[$_SERVER['SERVER_ADDR']] : $websocketMap['127.0.0.1'];
 ?>
 <!DOCTYPE html>
 <html lang="da" dir="ltr">
@@ -36,10 +36,10 @@ $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocke
                 </div>
             </div>
             <div class="waiting animated-bg" v-if="session.auth && pendingSync">
-                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                <div class="lds-ellipsis lds-ellipsis--dark"><div></div><div></div><div></div><div></div></div>
             </div>
             <div class="play my-3 mx-3" v-if="session.auth && !pendingSync">
-                <div class="vote" v-show="(!hasVoted || (joined.length !== votes.length)) && !votesData.length">
+                <div class="vote" v-if="(!hasVoted || (joined.length !== votes.length)) && !votesData.length && !joinedMidGame">
                     <div class="cards">
                         <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : chosenCard === index }" @click="select(card)" v-for="(card, index) in cards" :key="'card-'+index">
                             <div class="pcard__inner">
@@ -49,7 +49,7 @@ $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocke
                     </div>
                     <button class="btn btn-primary btn-huge snap-bottom" @click="vote" :disabled="hasVoted">Vote!</button>
                 </div>
-                <div class="showoff" v-show="votesData.length">
+                <div class="showoff" v-if="votesData.length">
                     <div class="votes">
                         <div class="pcard" v-for="(vote, index) in votesData" :key="'vote-'+index">
                             <div class="pcard__inner">
@@ -61,6 +61,10 @@ $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocke
                         </div>
                     </div>
                     <button class="btn btn-primary btn-huge snap-bottom" @click="next">Next!</button>
+                </div>
+                <div class="joined-mid-game" v-if="joinedMidGame">
+                    <h1>Vent til de andre er færdige med nuværende runde...</h1>
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             </div>
             <span class="mute-audio" @click="muteAudio">

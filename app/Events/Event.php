@@ -86,11 +86,11 @@ abstract class Event
     public function dispatch(Event $event)
     {
         if (static::$nestingLevel == self::MAX_NESTING) {
-            throw new Exception("Too many levels of nesting!");
+            throw new Exception('Too many levels of nesting!');
         }
 
         if ($event->type() === $this->type()) {
-            throw new Exception("Recursion error prevented!");
+            throw new Exception('Recursion error prevented!');
         }
 
         $event->setPublisher($this->getPublisher());

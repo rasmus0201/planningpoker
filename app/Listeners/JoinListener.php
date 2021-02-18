@@ -2,6 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Actions\ExcludeMidGameJoin;
+use App\Actions\Login;
+use App\Actions\PublishAvailableUsers;
 use App\Database;
 
 class JoinListener extends Listener
@@ -31,69 +34,22 @@ class JoinListener extends Listener
         }
 
         Database::run(
-            'UPDATE users SET resourceId = :resourceId, advanced = :advanced, clientId = :clientId, connected = 1 WHERE username = :username',
+            'UPDATE users SET advanced = 0, clientId = :clientId WHERE id = :id',
             [
-                ':resourceId' => $this->event->getPublisher()->resourceId,
-                ':advanced' => 0,
                 ':clientId' => $clientId,
-                ':username' => $user['username'],
+                ':id' => $user['id'],
             ]
         );
 
-        $users = Database::run(
-            'SELECT username FROM users WHERE connected = :connected',
-            [':connected' => 1]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        $loginAction = new Login($this->event);
+        $loginAction->run();
 
-        $votes = Database::run("SELECT u.username FROM votes v
-            LEFT JOIN users u ON u.id = v.user_id
-        ")->fetchAll(\PDO::FETCH_ASSOC);
+        // If there is already votes in,
+        // Then send a notification saying that you are waiting for results
+        $excludeMidGameJoinAction = new ExcludeMidGameJoin($this->event);
+        $excludeMidGameJoinAction->run();
 
-        $this->event->sendPublisher([
-            'type' => 'login',
-            'data' => [
-                'session' => [
-                    'clientId' => $clientId,
-                    'username' => $user['username'],
-                    'advanced' => 0,
-                    'auth' => true,
-                ],
-                'joined' => array_filter(array_unique(array_column($users, 'username'))),
-                'votes' => array_filter(array_unique(array_column($votes, 'username'))),
-            ]
-        ]);
-
-        $this->event->sendSubscribers([
-            'type' => 'join',
-            'data' => [
-                'username' => $user['username'],
-            ]
-        ]);
-
-        $this->publishAvailableUsers();
-    }
-
-    private function publishAvailableUsers()
-    {
-        $stmt = Database::run(
-            'SELECT username FROM users WHERE connected = :connected',
-            [':connected' => 0]
-        );
-
-        $users = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'username');
-
-        $this->event->sendPublisher([
-            'type' => 'users',
-            'data' => [
-                'users' => array_filter(array_unique($users)),
-            ],
-        ]);
-
-        $this->event->sendSubscribers([
-            'type' => 'users',
-            'data' => [
-                'users' => array_filter(array_unique($users)),
-            ],
-        ]);
+        $publishAvailableUsersAction = new PublishAvailableUsers($this->event);
+        $publishAvailableUsersAction->run();
     }
 }
