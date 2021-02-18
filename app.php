@@ -1,12 +1,20 @@
 <?php
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
 use App\EventDispatcher;
 use App\Socket;
+use Monolog\ErrorHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Ratchet\Http\HttpServer;
+use Ratchet\Server\IoServer;
+use Ratchet\WebSocket\WsServer;
 
 require __DIR__ . '/vendor/autoload.php';
+
+// Reigster error logging
+$logger = new Logger('PlanningPokerLogger');
+$logger->pushHandler(new StreamHandler(__DIR__.'/storage/planningpoker.log'));
+ErrorHandler::register($logger);
 
 $listeners = [
     'App\Events\OpenEvent' => [],

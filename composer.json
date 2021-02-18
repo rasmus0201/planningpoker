@@ -5,6 +5,7 @@
         }
     },
     "require": {
-        "cboden/ratchet": "^0.4"
+        "cboden/ratchet": "^0.4",
+        "monolog/monolog": "^2.2"
     }
 }

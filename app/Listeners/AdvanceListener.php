@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Actions\FinishRound;
 use App\Database;
 
 class AdvanceListener extends Listener
@@ -30,28 +31,12 @@ class AdvanceListener extends Listener
 
         Database::run('UPDATE users SET advanced = 1 WHERE id = :id', [':id' => $user['id']]);
 
-        $counts = Database::run(
-            'SELECT COUNT(*) user_count, SUM(advanced) as advanced_count FROM users WHERE connected = :connected and clientId IS NOT NULL',
-            [':connected' => 1]
-        )->fetch(\PDO::FETCH_ASSOC);
+        $this->finishRound();
+    }
 
-        if ($counts['user_count'] === $counts['advanced_count']) {
-            Database::run('DELETE FROM votes');
-            Database::run('UPDATE users SET advanced = 0');
-
-            $this->event->sendPublisher([
-                'type' => 'finish',
-                'data' => [
-                    'message' => 'Round finished, all moved to next round'
-                ]
-            ]);
-
-            $this->event->sendSubscribers([
-                'type' => 'finish',
-                'data' => [
-                    'message' => 'Round finished, all moved to next round'
-                ]
-            ]);
-        }
+    private function finishRound()
+    {
+        $action = new FinishRound($this->event);
+        $action->run();
     }
 }
