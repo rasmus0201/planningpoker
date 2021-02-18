@@ -129,9 +129,9 @@ html {
     padding: 0px 0.625rem;
 }
 
-.mute-audio {
+.mute-audio,
+.clear-storage {
     position: fixed;
-    top: 15px;
     right: 15px;
     background-color: rgb(69, 163, 229);
     color: #fff;
@@ -141,7 +141,16 @@ html {
     cursor: pointer;
 }
 
-.mute-audio svg {
+.mute-audio {
+    top: 15px;
+}
+
+.clear-storage {
+    top: 65px;
+}
+
+.mute-audio svg,
+.clear-storage svg {
     width: 20px;
     height: 20px;
 }

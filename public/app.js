@@ -117,6 +117,7 @@ const app = new Vue({
         
         clearStorage() {
             window.localStorage.clear();
+            window.location.reload(true);
         },
         
         openSocket() {
