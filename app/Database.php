@@ -19,10 +19,12 @@ class Database
     private $dbh;
 
     private $allUsers = [
-        'jkc',
+        'evd',
+        'jcl',
+        'kba',
+        'lbk',
         'mng',
         'ofm',
-        'rby',
         'rso',
         'sse',
     ];
