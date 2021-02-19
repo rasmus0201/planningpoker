@@ -16,7 +16,6 @@ class UserRepository extends AbstractRepository
 
     public function getConnectedUsers()
     {
-        // TODO: Maybe SELECT username instead of *
         return Database::run(
             'SELECT * FROM users WHERE connected = 1 AND clientId IS NOT NULL'
         )->fetchAll(PDO::FETCH_ASSOC);
@@ -48,7 +47,6 @@ class UserRepository extends AbstractRepository
 
     public function getUsersThatVoted()
     {
-        // TODO: Maybe remove clientId clause
         return Database::run('SELECT u.* FROM votes v
                 LEFT JOIN users u ON u.id = v.user_id
                 WHERE u.connected = 1

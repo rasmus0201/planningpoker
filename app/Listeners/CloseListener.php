@@ -24,12 +24,6 @@ class CloseListener extends Listener
             $voteRepository->deleteByUserId($user['id']);
 
             $users = $userRepository->getConnectedUsers();
-
-            // TODO: Check if new query works.
-            // $votes = \App\Database::run('SELECT u.username FROM votes v
-            //     LEFT JOIN users u ON u.id = v.user_id
-            //     WHERE u.connected = 1
-            // ')->fetchAll(\PDO::FETCH_ASSOC);
             $votes = $voteRepository->getVotes();
 
             $this->event->sendSubscribers([
