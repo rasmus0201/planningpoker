@@ -2,7 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Database;
+use App\Actions\FinishRound;
+use App\Actions\ShowOff;
+use App\RepositoryFactory;
 
 class CloseListener extends Listener
 {
@@ -13,16 +15,42 @@ class CloseListener extends Listener
 
     public function handle()
     {
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE resourceId = :resourceId LIMIT 1',
-            [':resourceId' => $this->event->getPublisher()->resourceId]
-        );
+        $userRepository = RepositoryFactory::createUser();
+        $voteRepository = RepositoryFactory::createVote();
 
-        if ($user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            Database::run(
-                'UPDATE users SET connected = 0, resourceId = NULL WHERE id = :id',
-                [':id' => $user['id']]
-            );
+        $resourceId = $this->event->getPublisher()->resourceId;
+        if ($user = $userRepository->getByResourceId($resourceId)) {
+            $userRepository->setUnconnectedById((int) $user['id']);
+            $voteRepository->deleteByUserId((int) $user['id']);
+
+            $users = $userRepository->getConnectedUsers();
+            $votes = $voteRepository->getVotes();
+
+            $this->event->sendSubscribers([
+                'type' => 'leave',
+                'data' => [
+                    'joined' => array_filter(array_unique(array_column($users, 'username'))),
+                    'votes' => array_filter(array_unique(array_column($votes, 'username'))),
+                ]
+            ]);
+
+            // Check to see if we should make a show off.
+            $this->sendShowoffIfAllVoted();
+
+            // Check to see if we should finish the round, and begin a new one.
+            $this->finishRound();
         }
+    }
+
+    private function sendShowoffIfAllVoted()
+    {
+        $action = new ShowOff($this->event);
+        $action->run();
+    }
+
+    private function finishRound()
+    {
+        $action = new FinishRound($this->event);
+        $action->run();
     }
 }

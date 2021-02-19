@@ -15,6 +15,7 @@ const app = new Vue({
                 auth: false,
             },
             pendingSync: false,
+            joinedMidGame: false, // If use joins in the middle of someone else playing.
             chosenCard: null, // What card did the user choose
             votes: [], // Which users have voted
             votesData: [], // Which users voted what
@@ -70,7 +71,7 @@ const app = new Vue({
 
     mounted() {
         this.stopAudio();
-        
+
         let clientId = window.localStorage.getItem('clientId');
 
         if (!clientId) {
@@ -107,19 +108,19 @@ const app = new Vue({
             if (this.$refs['audio'] && !this.$refs['audio'].paused) {
                 this.stopAudio();
             }
- 
+
             this.muted = !this.muted;
 
             if (this.muted === false && (this.pendingSync || (this.hasVoted && !this.votesData.length))) {
                 this.startAudio();
             }
         },
-        
+
         clearStorage() {
             window.localStorage.clear();
             window.location.reload(true);
         },
-        
+
         openSocket() {
             this.connection = new WebSocket(window.PLANNINGPOKER.websocketUrl);
 
@@ -170,7 +171,7 @@ const app = new Vue({
 
         next() {
             this.startAudio();
-            
+
             // Remove votes data
             this.chosenCard = null;
             this.votes = [];
@@ -178,7 +179,7 @@ const app = new Vue({
             window.localStorage.setItem('lastVoteIndex', null);
 
             this.pendingSync = true;
-           
+
             // Send next/"remove vote" message
             this.send('advance', this.session);
         },
@@ -198,14 +199,29 @@ const app = new Vue({
                     break;
                 case 'login':
                     this.session = data.session;
-                    this.pendingSync = (parseInt(data.session.advanced) !== 0);
+                    this.pendingSync = (data.session.advanced === true);
+                    this.joinedMidGame = (data.session.midgame_join === true);
                     this.joined = data.joined;
                     this.votes = data.votes;
+
+                    // Make sure to update other connections, that this is user actually advanced
+                    if (this.pendingSync) {
+                        this.send('advance', this.session);
+                    }
+
                     break;
                 case 'join':
                     if (this.joined.indexOf(data.username) === -1) {
                         this.joined.push(data.username);
                     }
+                    break;
+                case 'midgame_join':
+                    this.joinedMidGame = true;
+                    break;
+                case 'leave':
+                    this.joined = data.joined;
+                    this.votes = data.votes;
+
                     break;
                 case 'vote':
                     if (this.votes.indexOf(data.username) === -1) {
@@ -213,8 +229,9 @@ const app = new Vue({
                     }
                     break;
                 case 'finish':
+                    this.joinedMidGame = false;
                     this.pendingSync = false;
-                    
+
                     // Remove votes data
                     this.chosenCard = null;
                     this.votes = [];
@@ -222,11 +239,14 @@ const app = new Vue({
                     window.localStorage.setItem('lastVoteIndex', null);
 
                     this.stopAudio();
-                    
+
                     break;
                 case 'showoff':
+                    window.localStorage.setItem('lastVoteIndex', null);
+                    this.chosenCard = null;
+                    this.joinedMidGame = false;
                     this.votesData = data;
-                    
+
                     this.stopAudio();
                     break;
             }

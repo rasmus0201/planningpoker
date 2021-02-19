@@ -1,12 +1,22 @@
 <?php
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
 use App\EventDispatcher;
+use App\Log;
 use App\Socket;
+use Monolog\ErrorHandler;
+use Ratchet\Http\HttpServer;
+use Ratchet\Server\IoServer;
+use Ratchet\WebSocket\WsServer;
+
+define('ABS_PATH', __DIR__);
+
+error_reporting(E_ALL & ~E_WARNING);
 
 require __DIR__ . '/vendor/autoload.php';
+
+// Reigster error logging
+$log = Log::getInstance();
+ErrorHandler::register($log->getLogger());
 
 $listeners = [
     'App\Events\OpenEvent' => [],

@@ -2,7 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Database;
+use App\Actions\ShowOff;
+use App\RepositoryFactory;
 
 class VoteListener extends Listener
 {
@@ -13,26 +14,40 @@ class VoteListener extends Listener
 
     public function handle()
     {
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
-            [
-                ':clientId' => $this->event->data['data']['clientId'] ?? ''
-            ]
-        );
+        $clientId = $this->event->data['data']['clientId'] ?? '';
+        $voteId = (int) $this->event->data['data']['vote'] ?? 0;
 
-        if (!$user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        if (!$clientId) {
+            $this->sendResetVote();
+
             return;
         }
 
-        Database::run("INSERT INTO votes (user_id, vote_id) VALUES (:user_id, :vote_id)", [
-            ':user_id' => (int) $user['id'],
-            ':vote_id' => (int) $this->event->data['data']['vote'],
-        ]);
+        if ($voteId < 0 || $voteId > 12) {
+            $this->sendResetVote();
+
+            return;
+        }
+
+        $userRepository = RepositoryFactory::createUser();
+
+        if (!$user = $userRepository->getByClientId($clientId)) {
+            $this->sendResetVote();
+
+            return;
+        }
+
+        $voteRepository = RepositoryFactory::createVote();
+
+        $voteRepository->insertVote(
+            $user['id'],
+            $voteId
+        );
 
         $this->event->sendSubscribers([
             'type' => 'vote',
             'data' => [
-                'username' => $this->event->data['data']['username'] ?? '',
+                'username' => $user['username'],
             ]
         ]);
 
@@ -41,27 +56,16 @@ class VoteListener extends Listener
 
     private function sendShowoffIfAllVoted()
     {
-        // Check if last vote, if so send the answers.
-        $countConnectedUsers = Database::run("SELECT COUNT(*) as count FROM users WHERE connected = 1 AND clientId IS NOT NULL")->fetch(\PDO::FETCH_ASSOC);
-        $votes = Database::run("SELECT u.username, v.vote_id FROM votes v
-            INNER JOIN users u ON u.id = v.user_id
-            WHERE u.connected = 1
-            AND u.clientId IS NOT NULL
-            ORDER BY u.id
-        ")->fetchAll(\PDO::FETCH_ASSOC);
+        $action = new ShowOff($this->event);
 
-        if (((int) $countConnectedUsers['count']) !== count($votes)) {
-            return;
-        }
+        $action->run();
+    }
 
+    private function sendResetVote()
+    {
         $this->event->sendPublisher([
-            'type' => 'showoff',
-            'data' => $votes
-        ]);
-
-        $this->event->sendSubscribers([
-            'type' => 'showoff',
-            'data' => $votes
+            'type' => 'reset_vote',
+            'data' => []
         ]);
     }
 }

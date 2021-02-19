@@ -38,23 +38,24 @@ class Database
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
         if ($this->dbh && $shouldMigrate) {
-            $this->dbh->exec("CREATE TABLE IF NOT EXISTS votes (
+            $this->dbh->exec('CREATE TABLE IF NOT EXISTS votes (
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 vote_id INTEGER NOT NULL
-            )");
+            )');
 
-            $this->dbh->exec("CREATE TABLE IF NOT EXISTS users (
+            $this->dbh->exec('CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY,
                 clientId TEXT,
                 resourceId TEXT,
-                advanced INTEGER DEFAULT 0,
+                is_advanced INTEGER DEFAULT 0,
+                is_excluded INTEGER DEFAULT 0,
                 username TEXT NOT NULL UNIQUE,
-                connected INTEGER
-            )");
+                connected INTEGER DEFAULT 0
+            )');
 
             foreach ($this->allUsers as $user) {
-                $stmt = $this->dbh->prepare("INSERT INTO users (username, connected) VALUES (:username, 0)");
+                $stmt = $this->dbh->prepare('INSERT INTO users (username, connected) VALUES (:username, 0)');
                 $stmt->execute([
                     ':username' => $user
                 ]);
@@ -88,9 +89,12 @@ class Database
             return self::instance()->dbh->query($sql);
         }
 
-        $stmt = self::instance()->dbh->prepare($sql);
-        $stmt->execute($args);
-
-        return $stmt;
+        try {
+            $stmt = self::instance()->dbh->prepare($sql);
+            $stmt->execute($args);
+            return $stmt;
+        } catch (\Throwable $th) {
+            \App\Log::error("Query failed: {$th->getMessage()}, SQL: {$sql}");
+        }
     }
 }
