@@ -89,9 +89,12 @@ class Database
             return self::instance()->dbh->query($sql);
         }
 
-        $stmt = self::instance()->dbh->prepare($sql);
-        $stmt->execute($args);
-
-        return $stmt;
+        try {
+            $stmt = self::instance()->dbh->prepare($sql);
+            $stmt->execute($args);
+            return $stmt;
+        } catch (\Throwable $th) {
+            \App\Log::error("Query failed: {$th->getMessage()}, SQL: {$sql}");
+        }
     }
 }

@@ -20,8 +20,8 @@ class CloseListener extends Listener
 
         $resourceId = $this->event->getPublisher()->resourceId;
         if ($user = $userRepository->getByResourceId($resourceId)) {
-            $userRepository->setUnconnectedById($user['id']);
-            $voteRepository->deleteByUserId($user['id']);
+            $userRepository->setUnconnectedById((int) $user['id']);
+            $voteRepository->deleteByUserId((int) $user['id']);
 
             $users = $userRepository->getConnectedUsers();
             $votes = $voteRepository->getVotes();
