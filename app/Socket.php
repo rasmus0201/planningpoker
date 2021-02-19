@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Events\CloseEvent;
-use App\Events\ErrorEvent;
 use App\Events\MessageEvent;
 use App\Events\OpenEvent;
 use Exception;
@@ -33,13 +32,7 @@ class Socket implements MessageComponentInterface
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            $this->sendError(
-                $conn,
-                [
-                    $e->getMessage(),
-                    explode("\n", $e->getTraceAsString())
-                ]
-            );
+            Log::debug($e->getMessage());
         }
     }
 
@@ -55,13 +48,7 @@ class Socket implements MessageComponentInterface
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            $this->sendError(
-                $from,
-                [
-                    $e->getMessage(),
-                    explode("\n", $e->getTraceAsString())
-                ]
-            );
+            Log::debug($e->getMessage());
         }
     }
 
@@ -78,7 +65,7 @@ class Socket implements MessageComponentInterface
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            // Nothing to send error to.
+            Log::debug($e->getMessage());
         }
     }
 
@@ -89,25 +76,8 @@ class Socket implements MessageComponentInterface
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
             $event->setEventDispatcher(clone $this->eventDispatcher);
-        } catch (Exception $eventException) {
-            $this->sendError(
-                $conn,
-                [
-                    $e->getMessage(),
-                    explode("\n", $e->getTraceAsString())
-                ]
-            );
+        } catch (Exception $e) {
+            Log::debug($e->getMessage());
         }
-    }
-
-    private function sendError($connection, $error = '')
-    {
-        $connection->send(json_encode([
-            'type' => 'error',
-            'message' => 'Something went wrong.',
-            'data' => [
-                'error' => $error
-            ]
-        ]));
     }
 }
