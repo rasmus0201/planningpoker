@@ -1,2 +1,4 @@
 /vendor
 /db.sqlite
+/storage/*
+!/storage/.gitkeep
