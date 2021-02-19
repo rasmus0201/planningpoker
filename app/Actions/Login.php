@@ -2,35 +2,23 @@
 
 namespace App\Actions;
 
-use App\Database;
+use App\RepositoryFactory;
 
 class Login extends Action
 {
     public function run()
     {
+        $userRepository = RepositoryFactory::createUser();
         $clientId = $this->event->data['data']['clientId'] ?? '';
 
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
-            [':clientId' => $clientId]
-        );
-
-        if ($user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            Database::run(
-                'UPDATE users SET resourceId = :resourceId, connected = 1 WHERE id = :id',
-                [
-                    ':resourceId' => $this->event->getPublisher()->resourceId,
-                    ':id' => $user['id']
-                ]
+        if ($user = $userRepository->getByClientId($clientId)) {
+            $userRepository->setConnectedById(
+                $user['id'],
+                $this->event->getPublisher()->resourceId
             );
 
-            $users = Database::run('SELECT username FROM users WHERE connected = 1 and clientId IS NOT NULL')
-                ->fetchAll(\PDO::FETCH_ASSOC);
-
-            $votes = Database::run('SELECT u.username FROM votes v
-                LEFT JOIN users u ON u.id = v.user_id
-                WHERE u.connected = 1
-            ')->fetchAll(\PDO::FETCH_ASSOC);
+            $users = $userRepository->getConnectedUsers();
+            $votes = $userRepository->getUsersThatVoted();
 
             $this->event->sendPublisher([
                 'type' => 'login',
@@ -38,8 +26,8 @@ class Login extends Action
                     'session' => [
                         'clientId' => $clientId,
                         'username' => $user['username'],
-                        'advanced' => (bool) $user['advanced'],
-                        'midgame_join' => (bool) $user['excluded'],
+                        'advanced' => (bool) $user['is_advanced'],
+                        'midgame_join' => (bool) $user['is_excluded'],
                         'auth' => true,
                     ],
                     'joined' => array_filter(array_unique(array_column($users, 'username'))),

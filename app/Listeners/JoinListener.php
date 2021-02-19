@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Actions\ExcludeMidGameJoin;
 use App\Actions\Login;
 use App\Actions\PublishAvailableUsers;
-use App\Database;
+use App\RepositoryFactory;
 
 class JoinListener extends Listener
 {
@@ -17,29 +17,22 @@ class JoinListener extends Listener
     public function handle()
     {
         $clientId = $this->event->data['data']['clientId'] ?? '';
+        $username = $this->event->data['data']['username'] ?? '';
 
-        if (!$clientId) {
+        if (!$clientId || !$username) {
             return;
         }
 
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE username = :username LIMIT 1',
-            [
-                ':username' => $this->event->data['data']['username'] ?? ''
-            ]
-        );
+        $userRepository = RepositoryFactory::createUser();
 
-        if (!$user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        if (!$user = $userRepository->getByUsername($username)) {
             return;
         }
 
-        Database::run(
-            'UPDATE users SET advanced = 0, clientId = :clientId WHERE id = :id',
-            [
-                ':clientId' => $clientId,
-                ':id' => $user['id'],
-            ]
-        );
+        // Reset user info
+        $userRepository->setClientIdById($user['id'], $clientId);
+        $userRepository->setAdvancedById($user['id'], 0);
+        $userRepository->setExcludedById($user['id'], 0);
 
         $loginAction = new Login($this->event);
         $loginAction->run();

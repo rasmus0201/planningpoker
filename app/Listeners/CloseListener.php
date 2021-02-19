@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Actions\FinishRound;
 use App\Actions\ShowOff;
-use App\Database;
+use App\RepositoryFactory;
 
 class CloseListener extends Listener
 {
@@ -15,30 +15,22 @@ class CloseListener extends Listener
 
     public function handle()
     {
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE resourceId = :resourceId LIMIT 1',
-            [':resourceId' => $this->event->getPublisher()->resourceId]
-        );
+        $userRepository = RepositoryFactory::createUser();
+        $voteRepository = RepositoryFactory::createVote();
 
-        if ($user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            Database::run(
-                'UPDATE users SET connected = 0, resourceId = NULL WHERE id = :id',
-                [':id' => $user['id']]
-            );
+        $resourceId = $this->event->getPublisher()->resourceId;
+        if ($user = $userRepository->getByResourceId($resourceId)) {
+            $userRepository->setUnconnectedById($user['id']);
+            $voteRepository->deleteByUserId($user['id']);
 
-            Database::run(
-                'DELETE FROM votes WHERE user_id = :userId',
-                [':userId', $user['id']]
-            );
+            $users = $userRepository->getConnectedUsers();
 
-            $users = Database::run(
-                'SELECT username FROM users WHERE connected = 1 and clientId IS NOT NULL'
-            )->fetchAll(\PDO::FETCH_ASSOC);
-
-            $votes = Database::run('SELECT u.username FROM votes v
-                LEFT JOIN users u ON u.id = v.user_id
-                WHERE u.connected = 1
-            ')->fetchAll(\PDO::FETCH_ASSOC);
+            // TODO: Check if new query works.
+            // $votes = \App\Database::run('SELECT u.username FROM votes v
+            //     LEFT JOIN users u ON u.id = v.user_id
+            //     WHERE u.connected = 1
+            // ')->fetchAll(\PDO::FETCH_ASSOC);
+            $votes = $voteRepository->getVotes();
 
             $this->event->sendSubscribers([
                 'type' => 'leave',
@@ -59,14 +51,12 @@ class CloseListener extends Listener
     private function sendShowoffIfAllVoted()
     {
         $action = new ShowOff($this->event);
-
         $action->run();
     }
 
     private function finishRound()
     {
         $action = new FinishRound($this->event);
-
         $action->run();
     }
 }

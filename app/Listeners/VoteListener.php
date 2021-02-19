@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Actions\ShowOff;
-use App\Database;
+use App\RepositoryFactory;
 
 class VoteListener extends Listener
 {
@@ -14,26 +14,40 @@ class VoteListener extends Listener
 
     public function handle()
     {
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
-            [
-                ':clientId' => $this->event->data['data']['clientId'] ?? ''
-            ]
-        );
+        $clientId = $this->event->data['data']['clientId'] ?? '';
+        $voteId = (int) $this->event->data['data']['vote'] ?? 0;
 
-        if (!$user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        if (!$clientId) {
+            $this->sendResetVote();
+
             return;
         }
 
-        Database::run('INSERT INTO votes (user_id, vote_id) VALUES (:user_id, :vote_id)', [
-            ':user_id' => (int) $user['id'],
-            ':vote_id' => (int) $this->event->data['data']['vote'],
-        ]);
+        if ($voteId < 0 || $voteId > 12) {
+            $this->sendResetVote();
+
+            return;
+        }
+
+        $userRepository = RepositoryFactory::createUser();
+
+        if (!$user = $userRepository->getByClientId($clientId)) {
+            $this->sendResetVote();
+
+            return;
+        }
+
+        $voteRepository = RepositoryFactory::createVote();
+
+        $voteRepository->insertVote(
+            $user['id'],
+            $voteId
+        );
 
         $this->event->sendSubscribers([
             'type' => 'vote',
             'data' => [
-                'username' => $this->event->data['data']['username'] ?? '',
+                'username' => $user['username'],
             ]
         ]);
 
@@ -45,5 +59,13 @@ class VoteListener extends Listener
         $action = new ShowOff($this->event);
 
         $action->run();
+    }
+
+    private function sendResetVote()
+    {
+        $this->event->sendPublisher([
+            'type' => 'reset_vote',
+            'data' => []
+        ]);
     }
 }

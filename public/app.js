@@ -229,6 +229,7 @@ const app = new Vue({
                     }
                     break;
                 case 'finish':
+                    this.joinedMidGame = false;
                     this.pendingSync = false;
 
                     // Remove votes data
