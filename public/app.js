@@ -5,7 +5,7 @@ const app = new Vue({
 
     data() {
         return {
-            muted: false,
+            muted: true,
             conn: null,
             availableUsers: [],
             joined: [],
@@ -69,6 +69,8 @@ const app = new Vue({
     },
 
     mounted() {
+        this.stopAudio();
+        
         let clientId = window.localStorage.getItem('clientId');
 
         if (!clientId) {
@@ -111,6 +113,11 @@ const app = new Vue({
             if (this.muted === false && (this.pendingSync || (this.hasVoted && !this.votesData.length))) {
                 this.startAudio();
             }
+        },
+        
+        clearStorage() {
+            window.localStorage.clear();
+            window.location.reload(true);
         },
         
         openSocket() {
