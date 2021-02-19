@@ -242,6 +242,8 @@ const app = new Vue({
 
                     break;
                 case 'showoff':
+                    window.localStorage.setItem('lastVoteIndex', null);
+                    this.chosenCard = null;
                     this.joinedMidGame = false;
                     this.votesData = data;
 
