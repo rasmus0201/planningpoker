@@ -2,7 +2,7 @@
 
 namespace App\Actions;
 
-use App\Database;
+use App\RepositoryFactory;
 
 class ExcludeMidGameJoin extends Action
 {
@@ -14,22 +14,16 @@ class ExcludeMidGameJoin extends Action
             return;
         }
 
-       $votesCount = Database::run('SELECT COUNT(v.id) as count FROM votes v
-            LEFT JOIN users u ON u.id = v.user_id
-            WHERE u.connected = 1
-            AND u.clientId != :clientId
-            LIMIT 1',
-            [':clientId' => $clientId]
-        )->fetch(\PDO::FETCH_ASSOC);
+        $userRepository = RepositoryFactory::createUser();
+        $voteRepository = RepositoryFactory::createVote();
+
+        $votesCount = $voteRepository->countVotesExcludeByClientId($clientId);
 
         // If there is already votes in,
         // Then send a notification saying that you are waiting for results
-        if (intval($votesCount['count']) > 0) {
+        if ($votesCount > 0) {
             // Set exclude flag for user
-            Database::run(
-                'UPDATE users SET excluded = 1 WHERE clientId = :clientId',
-                [':clientId' => $clientId]
-            );
+            $userRepository->setExcludedByClientId($clientId, 1);
 
             $this->event->sendSubscribers([
                 'type' => 'excluded',

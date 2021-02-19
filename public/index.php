@@ -36,7 +36,7 @@ $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocke
                 </div>
             </div>
             <div class="waiting animated-bg" v-if="session.auth && pendingSync">
-                <div class="lds-ellipsis lds-ellipsis--dark"><div></div><div></div><div></div><div></div></div>
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             </div>
             <div class="play my-3 mx-3" v-if="session.auth && !pendingSync">
                 <div class="vote" v-if="(!hasVoted || (joined.length !== votes.length)) && !votesData.length && !joinedMidGame">
@@ -62,9 +62,9 @@ $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocke
                     </div>
                     <button class="btn btn-primary btn-huge snap-bottom" @click="next">Next!</button>
                 </div>
-                <div class="joined-mid-game" v-if="joinedMidGame">
+                <div class="joined-mid-game" v-if="joinedMidGame && !votesData.length">
                     <h1>Vent til de andre er færdige med nuværende runde...</h1>
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    <div class="lds-ellipsis lds-ellipsis--dark"><div></div><div></div><div></div><div></div></div>
                 </div>
             </div>
             <span class="mute-audio" @click="muteAudio">

@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Actions\FinishRound;
-use App\Database;
+use App\RepositoryFactory;
 
 class AdvanceListener extends Listener
 {
@@ -20,22 +20,17 @@ class AdvanceListener extends Listener
             return;
         }
 
-        $stmt = Database::run(
-            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
-            [':clientId' => $clientId]
-        );
+        $userRepository = RepositoryFactory::createUser();
 
-        if (!$user = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        if (!$user = $userRepository->getByClientId($clientId)) {
             return;
         }
 
-        Database::run('UPDATE users SET advanced = 1 WHERE id = :id', [':id' => $user['id']]);
+        $userRepository->setAdvancedById(
+            $user['id'],
+            1
+        );
 
-        $this->finishRound();
-    }
-
-    private function finishRound()
-    {
         $action = new FinishRound($this->event);
         $action->run();
     }

@@ -48,8 +48,8 @@ class Database
                 id INTEGER PRIMARY KEY,
                 clientId TEXT,
                 resourceId TEXT,
-                advanced INTEGER DEFAULT 0,
-                `excluded` INTEGER DEFAULT 0,
+                is_advanced INTEGER DEFAULT 0,
+                is_excluded INTEGER DEFAULT 0,
                 username TEXT NOT NULL UNIQUE,
                 connected INTEGER DEFAULT 0
             )');

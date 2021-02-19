@@ -2,15 +2,17 @@
 
 namespace App\Actions;
 
-use App\Database;
+use App\RepositoryFactory;
 
 class PublishAvailableUsers extends Action
 {
     public function run()
     {
-        $stmt = Database::run('SELECT username FROM users WHERE connected = 0');
-
-        $users = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'username');
+        $userRepository = RepositoryFactory::createUser();
+        $users = array_column(
+            $userRepository->getUnconnectedUsers(),
+            'username'
+        );
 
         $this->event->sendPublisher([
             'type' => 'users',
