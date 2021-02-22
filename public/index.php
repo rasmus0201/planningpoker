@@ -1,10 +1,14 @@
 <?php
+
+$websocketScheme = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') ? 'ws' : 'wss';
+
 $websocketMap = [
-    '127.0.0.1' => 'ws://localhost:9000',
-    '165.227.174.67' => 'ws://planningpoker.rasmusbundsgaard.dk/websocket',
+    '127.0.0.1' => '://localhost:9000',
+    '165.227.174.67' => '://planningpoker.rasmusbundsgaard.dk/websocket',
 ];
 
 $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocketMap[$_SERVER['SERVER_ADDR']] : $websocketMap['127.0.0.1'];
+$websocketConnection = $websocketScheme . $websocketConnection;
 ?>
 <!DOCTYPE html>
 <html lang="da" dir="ltr">
