@@ -126,7 +126,9 @@ const app = new Vue({
 
             this.connection.onopen = this.onOpen;
             this.connection.onmessage = this.onMessage;
-            this.connection.onclose = function(e) { console.log('CLOSE', e); };
+            this.connection.onclose = () => {
+                setTimeout(this.clearStorage(), 1000);
+            };
             this.connection.onerror = function(e) { console.log('ERROR', e); };
         },
 
