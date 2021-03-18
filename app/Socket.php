@@ -8,16 +8,22 @@ use App\Events\OpenEvent;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use SplObjectStorage;
 
 class Socket implements MessageComponentInterface
 {
-    private $clients;
-    private $eventDispatcher;
+    private SplObjectStorage $clients;
+    private Application $app;
+    private EventDispatcher $eventDispatcher;
+    private Log $logger;
 
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(Application $app)
     {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->clients = new \SplObjectStorage();
+        $this->app = $app;
+        $this->clients = new SplObjectStorage();
+
+        $this->eventDispatcher = $this->app->make(EventDispatcher::class);
+        $this->logger = $this->app->make(Log::class);
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -28,11 +34,11 @@ class Socket implements MessageComponentInterface
             $event = new OpenEvent();
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
-            $event->setEventDispatcher(clone $this->eventDispatcher);
+            $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            Log::debug($e->getMessage());
+            $this->logger->debug($e->getMessage());
         }
     }
 
@@ -44,11 +50,11 @@ class Socket implements MessageComponentInterface
             $event = new MessageEvent($json);
             $event->setSubscribers($this->clients);
             $event->setPublisher($from);
-            $event->setEventDispatcher(clone $this->eventDispatcher);
+            $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            Log::debug($e->getMessage());
+            $this->logger->debug($e->getMessage());
         }
     }
 
@@ -61,11 +67,11 @@ class Socket implements MessageComponentInterface
             $event = new CloseEvent();
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
-            $event->setEventDispatcher(clone $this->eventDispatcher);
+            $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            Log::debug($e->getMessage());
+            $this->logger->debug($e->getMessage());
         }
     }
 
@@ -75,9 +81,9 @@ class Socket implements MessageComponentInterface
             $event = new CloseEvent($e);
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
-            $event->setEventDispatcher(clone $this->eventDispatcher);
+            $event->setEventDispatcher($this->eventDispatcher);
         } catch (Exception $e) {
-            Log::debug($e->getMessage());
+            $this->logger->debug($e->getMessage());
         }
     }
 }
