@@ -127,7 +127,11 @@ const app = new Vue({
             this.connection.onopen = this.onOpen;
             this.connection.onmessage = this.onMessage;
             this.connection.onclose = () => {
-                setTimeout(this.clearStorage(), 1000);
+                if (this.session.username !== '') {
+                    setTimeout(this.clearStorage(), 1000);
+                } else {
+                    window.alert('WebSocket connection closed.');
+                }
             };
             this.connection.onerror = function(e) { console.log('ERROR', e); };
         },

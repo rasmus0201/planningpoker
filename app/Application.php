@@ -1,24 +1,20 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App;
 
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
 class Application extends Container
 {
-    protected $availableBindings = [
-        'config' => 'registerConfigBindings',
-        'db' => 'registerDatabaseBindings',
-        \Illuminate\Database\Eloquent\Factory::class => 'registerDatabaseBindings',
-    ];
-
     private string $basePath = '';
     private bool $booted = false;
-    private array $ranServiceBinders = [];
     private array $loadedConfigurations = [];
     private array $loadedProviders = [];
 
@@ -58,21 +54,9 @@ class Application extends Container
         return $env;
     }
 
-    public function make($abstract, array $parameters = [])
+    public function boot(): void
     {
-        $abstract = $this->getAlias($abstract);
-
-        if (
-            !$this->bound($abstract) &&
-            array_key_exists($abstract, $this->availableBindings) &&
-            !array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)
-        ) {
-            $this->{$method = $this->availableBindings[$abstract]}();
-
-            $this->ranServiceBinders[$method] = true;
-        }
-
-        return parent::make($abstract, $parameters);
+        $this->registerDatabaseBindings();
     }
 
     /**
@@ -99,6 +83,13 @@ class Application extends Container
 
         if ($this->booted) {
             $this->bootProvider($provider);
+        }
+    }
+
+    protected function bootProvider(ServiceProvider $provider)
+    {
+        if (method_exists($provider, 'boot')) {
+            return $this->call([$provider, 'boot']);
         }
     }
 
@@ -149,17 +140,6 @@ class Application extends Container
         }
     }
 
-    public function loadComponent(string $config, array $providers, string $return = null)
-    {
-        $this->configure($config);
-
-        foreach ($providers as $provider) {
-            $this->register($provider);
-        }
-
-        return $this->make($return ?: $config);
-    }
-
     protected function bootstrapContainer(): void
     {
         static::setInstance($this);
@@ -172,13 +152,7 @@ class Application extends Container
         $this->instance('env', $this->environment());
 
         $this->registerContainerAliases();
-    }
-
-    protected function bootProvider(ServiceProvider $provider)
-    {
-        if (method_exists($provider, 'boot')) {
-            return $this->call([$provider, 'boot']);
-        }
+        $this->registerConfigBindings();
     }
 
     protected function registerContainerAliases(): void
@@ -190,6 +164,8 @@ class Application extends Container
             \Illuminate\Contracts\Container\Container::class => 'app',
             \Illuminate\Database\ConnectionResolverInterface::class => 'db',
             \Illuminate\Database\DatabaseManager::class => 'db',
+            Capsule::class => 'db',
+            \Illuminate\Database\Connection::class => 'db.connection',
             \Psr\Log\LoggerInterface::class => 'log',
         ];
     }
@@ -203,14 +179,25 @@ class Application extends Container
 
     protected function registerDatabaseBindings(): void
     {
-        $this->singleton('db', function () {
-            $this->configure('app');
+        $capsule = new Capsule();
 
-            return $this->loadComponent(
-                'database',
-                [DatabaseServiceProvider::class],
-                'db'
-            );
+        $connection = config('database.default');
+
+        $capsule->addConnection(config('database.connections.' . $connection));
+
+        $capsule->setAsGlobal();
+
+        $capsule->bootEloquent();
+
+        $this->singleton('db', function() use ($capsule) {
+            return $capsule;
+        });
+
+        $this->singleton('db.connection', function () use ($capsule) {
+            $connection = $capsule->getConnection();
+            $connection->useDefaultSchemaGrammar();
+
+            return $connection;
         });
     }
 }
