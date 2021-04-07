@@ -1,5 +1,7 @@
 <?php
 
+// require_once '../bootstrap/migrations.php';
+
 $websocketScheme = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') ? 'ws' : 'wss';
 
 $websocketMap = [
