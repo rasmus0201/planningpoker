@@ -13,7 +13,7 @@ $server = IoServer::factory(
             new Socket($app)
         )
     ),
-    9050
+    9000
 );
 
 $server->run();
