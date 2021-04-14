@@ -23,9 +23,9 @@ class Game extends Model
      * @var array
      */
     protected $fillable = [
+        'pin',
         'state',
         'created_at',
-        'finished_at',
     ];
 
     public function rounds(): HasMany

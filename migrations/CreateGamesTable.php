@@ -25,7 +25,6 @@ class CreateGamesTable extends Migration
             $table->string('pin')->unique();
             $table->string('state');
             $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('ended_at')->nullable();
         });
     }
 

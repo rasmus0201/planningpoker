@@ -13,7 +13,7 @@ class ConnectionRepository extends AbstractRepository
         return Connection::where('game_id', $gameId)->get();
     }
 
-    public function getByClientId(string $clientId): Connection
+    public function getByClientId(string $clientId): ?Connection
     {
         return Connection::where('client_id', $clientId)->first();
     }

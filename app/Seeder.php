@@ -64,11 +64,10 @@ class Seeder
         ]);
 
         Game::truncate();
-        Game::insert([
-            [
-                'pin' => 'guldfugl',
-                'state' => Game::STATE_LOBBY,
-            ]
-        ]);
+
+        Game::create([
+            'pin' => 'guldfugl',
+            'state' => Game::STATE_LOBBY,
+        ])->rounds()->create();
     }
 }
