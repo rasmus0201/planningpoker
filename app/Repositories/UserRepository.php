@@ -2,152 +2,95 @@
 
 namespace App\Repositories;
 
-use App\Database;
-use PDO;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository extends AbstractRepository
 {
-    public function getUnconnectedUsers()
+    public function getUnconnectedUsers(): Collection
     {
-        return Database::run(
-            'SELECT * FROM users WHERE connected = 0'
-        )->fetchAll(PDO::FETCH_ASSOC);
+        return User::withCount('connection')->having('connection_count', 0)->get();
     }
 
-    public function getConnectedUsers()
+    public function getConnectedUsers(): Collection
     {
-        return Database::run(
-            'SELECT * FROM users WHERE connected = 1 AND clientId IS NOT NULL'
-        )->fetchAll(PDO::FETCH_ASSOC);
+        return User::whereNotNull('client_id')
+            ->withCount('connection')
+            ->having('connection_count', '>', 0)
+            ->get();
     }
 
-    public function getByUsername($username)
+    public function getAuthenticatedPlayers(int $gameId): Collection
     {
-        return Database::run(
-            'SELECT * FROM users WHERE username = :username LIMIT 1',
-            [':username' => $username]
-        )->fetch(PDO::FETCH_ASSOC);
+        return User::whereNotNull('client_id')->where('type', '!=', User::TYPE_GAMEMASTER)->whereHas('connection', function (Builder $query) use ($gameId) {
+            $query->where('game_id', $gameId);
+        })->get();
     }
 
-    public function getByClientId($clientId)
+    public function getByUsername(string $username): ?User
     {
-        return Database::run(
-            'SELECT * FROM users WHERE clientId = :clientId LIMIT 1',
-            [':clientId' => $clientId]
-        )->fetch(PDO::FETCH_ASSOC);
+        return User::where('username', $username)->first();
     }
 
-    public function getByResourceId($resourceId)
+    public function getByClientId(string $clientId): ?User
     {
-        return Database::run(
-            'SELECT * FROM users WHERE resourceId = :resourceId LIMIT 1',
-            [':resourceId' => $resourceId]
-        )->fetch(PDO::FETCH_ASSOC);
+        return User::where('client_id', $clientId)->first();
     }
 
-    public function getUsersThatVoted()
+    public function getByConnectionId(int $connectionId): ?User
     {
-        return Database::run('SELECT u.* FROM votes v
-                LEFT JOIN users u ON u.id = v.user_id
-                WHERE u.connected = 1
-                AND u.clientId IS NOT NULL
-        ')->fetchAll(PDO::FETCH_ASSOC);
+        return User::whereHas('connection', function (Builder $query) use ($connectionId) {
+            $query->where('id', $connectionId);
+        })->first();
     }
 
-    public function countVotingUsers()
+    public function getVoted(int $roundId): Collection
     {
-        $countUsers = Database::run('SELECT COUNT(*) as count
-            FROM users
-            WHERE connected = 1
-            AND clientId IS NOT NULL
-            AND is_excluded = 0
-        ')->fetch(PDO::FETCH_ASSOC);
-
-        return (int) $countUsers['count'];
+        return User::whereNotNull('client_id')
+            ->has('connection')
+            ->whereHas('votes', function ($query) use ($roundId) {
+                $query->where('round_id', $roundId);
+            })
+            ->where('type', User::TYPE_PLAYER)
+            ->get();
     }
 
-    public function countAdvancedUsers()
+    public function countVoted(int $roundId): int
     {
-        $counts = Database::run('SELECT COUNT(*) user_count, SUM(is_advanced) as advanced_count
-            FROM users
-            WHERE connected = 1
-            AND is_excluded = 0
-            AND clientId IS NOT NULL
-        ')->fetch(PDO::FETCH_ASSOC);
-
-        return array_map('intval', $counts);
+        return User::whereNotNull('client_id')
+            ->has('connection')
+            ->whereHas('votes', function ($query) use ($roundId) {
+                $query->where('round_id', $roundId);
+            })
+            ->where('type', User::TYPE_PLAYER)
+            ->count();
     }
 
-    public function setConnectedById($id, $resourceId)
+    public function countConnectedUsers(int $gameId): int
     {
-        Database::run(
-            'UPDATE users SET resourceId = :resourceId, connected = 1 WHERE id = :id',
-            [
-                ':id' => $id,
-                ':resourceId' => $resourceId,
-            ]
-        );
+        return User::whereNotNull('client_id')
+            ->whereHas('connection', function (Builder $query) use ($gameId) {
+                $query->where('game_id', $gameId);
+            })
+            ->where('type', User::TYPE_PLAYER)
+            ->count();
     }
 
-    public function setUnconnectedById($id)
+    public function setClientIdById(int $id, string $clientId): void
     {
-        Database::run(
-            'UPDATE users SET resourceId = NULL, connected = 0 WHERE id = :id',
-            [':id' => $id]
-        );
+        User::where('id', $id)->update([
+            'client_id' => $clientId
+        ]);
     }
 
-    public function setClientIdById($id, $clientId)
+    public function cleanPreviousByClientId(string $clientId, int $currentUserId): void
     {
-        Database::run(
-            'UPDATE users SET clientId = :clientId WHERE id = :id',
-            [
-                ':id' => $id,
-                ':clientId' => $clientId
-            ]
-        );
-    }
-
-    public function setAdvancedById($id, $advanced)
-    {
-        Database::run(
-            'UPDATE users SET is_advanced = :advanced WHERE id = :id',
-            [
-                ':id' => $id,
-                ':advanced' => (int) $advanced
-            ]
-        );
-    }
-
-    public function setExcludedById($id, $excluded)
-    {
-        Database::run(
-            'UPDATE users SET is_excluded = :isExcluded WHERE id = :id',
-            [
-                ':id' => $id,
-                ':isExcluded' => (int) $excluded
-            ]
-        );
-    }
-
-    public function setExcludedByClientId($clientId, $excluded)
-    {
-        Database::run(
-            'UPDATE users SET is_excluded = :isExcluded WHERE clientId = :clientId',
-            [
-                ':clientId' => $clientId,
-                ':isExcluded' => (int) $excluded
-            ]
-        );
-    }
-
-    public function resetAdvancedAll()
-    {
-        Database::run('UPDATE users SET is_advanced = 0');
-    }
-
-    public function resetExcludedAll()
-    {
-        Database::run('UPDATE users SET is_excluded = 0');
+        User::where('id', '!=', $currentUserId)
+            ->where('client_id', $clientId)
+            ->doesntHave('connection')
+            ->update([
+                'client_id' => null,
+            ]);
     }
 }

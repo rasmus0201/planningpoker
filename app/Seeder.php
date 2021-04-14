@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Models\Game;
 use App\Models\User;
 
 class Seeder
@@ -60,6 +61,14 @@ class Seeder
                 'client_id' => null,
                 'type' => User::TYPE_SPECTATOR,
             ],
+        ]);
+
+        Game::truncate();
+        Game::insert([
+            [
+                'pin' => '123',
+                'state' => Game::STATE_LOBBY,
+            ]
         ]);
     }
 }

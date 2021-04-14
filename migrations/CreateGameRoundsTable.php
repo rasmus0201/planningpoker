@@ -22,7 +22,7 @@ class CreateGameRoundsTable extends Migration
     {
         $this->schema->create('game_rounds', function (Blueprint $table) {
             $table->id();
-            $table->string('game_id');
+            $table->integer('game_id')->unsigned();
         });
     }
 

@@ -25,6 +25,7 @@ $app = new Application(ABS_PATH);
 
 $app->configure('app');
 $app->configure('database');
+$app->configure('events');
 
 $app->boot();
 
@@ -35,22 +36,7 @@ $app->singleton(Log::class, function () use ($logger) {
 $app->alias(Log::class, 'log');
 
 $app->singleton(EventDispatcher::class, function(Application $app) {
-    $listeners = [
-        \App\Events\OpenEvent::class => [],
-        \App\Events\MessageEvent::class => [
-            \App\Listeners\TestListener::class,
-            \App\Listeners\ConnectListener::class,
-            \App\Listeners\JoinListener::class,
-            \App\Listeners\VoteListener::class,
-            \App\Listeners\AdvanceListener::class,
-        ],
-        \App\Events\CloseEvent::class => [
-            \App\Listeners\CloseListener::class,
-        ],
-        \App\Events\ErrorEvent::class => [],
-    ];
-
-    return new EventDispatcher($app, $listeners);
+    return new EventDispatcher($app, config('events'));
 });
 
 $app->singleton(\Illuminate\Filesystem\FilesystemManager::class, function (Application $app) {

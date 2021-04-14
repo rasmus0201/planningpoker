@@ -21,40 +21,41 @@ class Socket implements MessageComponentInterface
     {
         $this->app = $app;
         $this->clients = new SplObjectStorage();
-
         $this->eventDispatcher = $this->app->make(EventDispatcher::class);
         $this->logger = $this->app->make(Log::class);
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
+        $this->clients->attach($conn, [
+            'channel' => $this->getConnectionChannel($conn)
+        ]);
 
         try {
-            $event = new OpenEvent();
+            $event = new OpenEvent($conn->httpRequest);
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
             $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            $this->logger->debug($e->getMessage());
+            $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $conn, $msg)
     {
-        $json = json_decode($msg, true);
-
         try {
-            $event = new MessageEvent($json);
+            $json = json_decode($msg, true);
+
+            $event = new MessageEvent($conn->httpRequest, $json);
             $event->setSubscribers($this->clients);
-            $event->setPublisher($from);
+            $event->setPublisher($conn);
             $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            $this->logger->debug($e->getMessage());
+            $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
 
@@ -64,26 +65,36 @@ class Socket implements MessageComponentInterface
         $this->clients->detach($conn);
 
         try {
-            $event = new CloseEvent();
+            $event = new CloseEvent($conn->httpRequest);
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
             $event->setEventDispatcher($this->eventDispatcher);
 
             $this->eventDispatcher->dispatch($event);
         } catch (Exception $e) {
-            $this->logger->debug($e->getMessage());
+            $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
 
     public function onError(ConnectionInterface $conn, Exception $e)
     {
         try {
-            $event = new CloseEvent($e);
+            $event = new CloseEvent($conn->httpRequest, $e);
             $event->setSubscribers($this->clients);
             $event->setPublisher($conn);
             $event->setEventDispatcher($this->eventDispatcher);
         } catch (Exception $e) {
-            $this->logger->debug($e->getMessage());
+            $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
         }
+    }
+
+    private function getConnectionChannel(ConnectionInterface $conn): ?string
+    {
+        parse_str($conn->httpRequest->getUri()->getQuery(), $query);
+        if (!isset($query['channel'])) {
+            return null;
+        }
+
+        return $query['channel'];
     }
 }

@@ -25,6 +25,8 @@ class CreateGameVotesTable extends Migration
             $table->string('round_id');
             $table->integer('user_id');
             $table->string('vote');
+
+            $table->unique(['round_id', 'user_id']);
         });
     }
 

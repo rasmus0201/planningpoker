@@ -22,6 +22,7 @@ class CreateGamesTable extends Migration
     {
         $this->schema->create('games', function (Blueprint $table) {
             $table->id();
+            $table->string('pin')->unique();
             $table->string('state');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('ended_at')->nullable();

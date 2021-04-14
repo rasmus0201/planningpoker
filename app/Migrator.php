@@ -5,40 +5,30 @@ declare(strict_types=1);
 namespace App;
 
 use App\Application;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder as Schema;
 
 class Migrator
 {
     private Application $app;
-    private Connection $db;
     private Schema $schema;
 
     public function __construct(
         Application $app,
-        Connection $db,
         Schema $schema
     ) {
         $this->app = $app;
-        $this->db = $db;
         $this->schema = $schema;
+    }
+
+    public function dropAll(): void
+    {
+        $this->schema->dropAllTables();
     }
 
     public function shouldMigrate(): bool
     {
-        $database = $this->db->getConfig('database');
-
-        $migrationTable = $this->db->select('SELECT *
-            FROM `information_schema`.`TABLES` t
-            WHERE t.`table_schema` = :db
-                AND t.`table_name` = :tableName
-            LIMIT 1', [
-            'db' => $database,
-            'tableName' => 'migrations'
-        ]);
-
-        return empty($migrationTable);
+        return !$this->schema->hasTable('migrations');
     }
 
     /**

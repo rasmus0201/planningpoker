@@ -22,9 +22,10 @@ class CreateUsersTable extends Migration
     {
         $this->schema->create('users', function (Blueprint $table) {
             $table->id();
+            $table->integer('connection_id')->unsigned()->nullable();
+            $table->string('client_id')->nullable()->unique();
             $table->string('name');
             $table->string('username')->unique();
-            $table->string('client_id')->nullable();
             $table->string('type');
         });
     }

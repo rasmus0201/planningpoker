@@ -6,7 +6,7 @@ use App\Events\Event;
 
 abstract class Listener
 {
-    protected $event;
+    protected Event $event;
 
     abstract public function listen();
     abstract public function handle();
