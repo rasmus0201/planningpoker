@@ -66,7 +66,7 @@ class Seeder
         Game::truncate();
         Game::insert([
             [
-                'pin' => '123',
+                'pin' => 'guldfugl',
                 'state' => Game::STATE_LOBBY,
             ]
         ]);
