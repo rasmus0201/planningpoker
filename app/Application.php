@@ -184,9 +184,7 @@ class Application extends Container
         $connection = config('database.default');
 
         $capsule->addConnection(config('database.connections.' . $connection));
-
         $capsule->setAsGlobal();
-
         $capsule->bootEloquent();
 
         $this->singleton('db', function() use ($capsule) {
@@ -198,6 +196,10 @@ class Application extends Container
             $connection->useDefaultSchemaGrammar();
 
             return $connection;
+        });
+
+        $this->bind(\Illuminate\Database\Schema\Builder::class, function () {
+            return Capsule::schema('default');
         });
     }
 }

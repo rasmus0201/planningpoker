@@ -2,26 +2,23 @@
 
 namespace App\Listeners;
 
-use App\Actions\Login;
-use App\Actions\PublishAvailableUsers;
+use App\RepositoryFactory;
 
 class ConnectListener extends Listener
 {
     public function listen()
     {
-        return 'message:connect';
+        return 'open';
     }
 
     public function handle()
     {
-        $clientId = $this->event->data['data']['clientId'] ?? '';
-
-        if ($clientId) {
-            $loginAction = new Login($this->event);
-            $loginAction->run();
+        $ids = [];
+        foreach ($this->event->getSubscribers() as $subscriber) {
+            $ids[] = $subscriber->resourceId;
         }
 
-        $publishAvailableUsersAction = new PublishAvailableUsers($this->event);
-        $publishAvailableUsersAction->run();
+        $connectionRepository = RepositoryFactory::createConnection();
+        $connectionRepository->syncByIds($ids);
     }
 }

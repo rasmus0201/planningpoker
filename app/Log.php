@@ -5,30 +5,25 @@ namespace App;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
-/**
- * @method static void debug($message, array $context = [])
- * @method static void info($message, array $context = [])
- * @method static void notice($message, array $context = [])
- * @method static void notice($message, array $context = [])
- * @method static void warning($message, array $context = [])
- * @method static void error($message, array $context = [])
- * @method static void critical($message, array $context = [])
- * @method static void alert($message, array $context = [])
- * @method static void emergency($message, array $context = [])
- */
 class Log extends Logger
 {
+    private static ?Log $instance;
+
     public function __construct($storagePath)
     {
+        self::$instance = null;
+
         parent::__construct('PlanningPokerLogger', [
             new StreamHandler($storagePath . '/planningpoker.log')
         ]);
     }
 
-    public static function __callStatic($name, $arguments)
+    public static function get(): Log
     {
-        $instance = app()->make(Log::class);
+        if (self::$instance === null) {
+            self::$instance = app()->make(Log::class);
+        }
 
-        $instance->log($name, ...$arguments);
+        return self::$instance;
     }
 }

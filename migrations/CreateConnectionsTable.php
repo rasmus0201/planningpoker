@@ -21,8 +21,10 @@ class CreateConnectionsTable extends Migration
     public function up()
     {
         $this->schema->create('connections', function (Blueprint $table) {
-            $table->integer('resource_id')->unsigned()->unique();
+            $table->integer('id')->primary()->comment('This is the connection\'s resource_id');
             $table->integer('user_id')->unsigned()->nullable();
+            $table->integer('game_id')->unsigned()->nullable();
+            $table->string('client_id')->unique();
         });
     }
 
