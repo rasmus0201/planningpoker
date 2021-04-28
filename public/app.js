@@ -131,6 +131,12 @@ const app = new Vue({
       return window.sessionStorage.getItem("session");
     },
 
+    updateCardValue(index, event) {
+      this.$set(this.game.cards, index, {
+        value: event.target.innerText.replace(/(\r\n|\n|\r)/gm, ' ').trim()
+      });
+    },
+
     join() {
       if (this.session.pin.trim() == "") {
         window.alert("Type game pin");
