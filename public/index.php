@@ -5,7 +5,7 @@
 $websocketScheme = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') ? 'ws' : 'wss';
 
 $websocketMap = [
-    '127.0.0.1' => '://localhost:9050',
+    '127.0.0.1' => '://127.0.0.1:9000',
     '165.227.174.67' => '://planningpoker.rasmusbundsgaard.dk/websocket',
 ];
 
@@ -158,7 +158,7 @@ $websocketConnection = $websocketScheme . $websocketConnection;
                 <div class="cards">
                     <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : game.chosenCard === index }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index">
                         <div class="pcard__inner">
-                            <div class="pcard__symbol pcard__symbol--big">{{ card.value }}</div>
+                            <div class="pcard__symbol pcard__symbol--big" contenteditable @blur="updateCardValue(index, $event)">{{ card.value }}</div>
                         </div>
                     </button>
                 </div>
