@@ -20,46 +20,60 @@ $websocketConnection = $websocketScheme . $websocketConnection;
     <title>Planning Poker</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="app.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         window.PLANNINGPOKER = {
             websocketUrl: "<?php echo $websocketConnection; ?>",
             cards: [{
+                    type: 'system',
                     value: '0',
                 },
                 {
+                    type: 'system',
                     value: '0.5',
                 },
                 {
+                    type: 'system',
                     value: '1',
                 },
                 {
+                    type: 'system',
                     value: '2',
                 },
                 {
+                    type: 'system',
                     value: '3',
                 },
                 {
+                    type: 'system',
                     value: '5',
                 },
                 {
+                    type: 'system',
                     value: '8',
                 },
                 {
+                    type: 'system',
                     value: '13',
                 },
                 {
+                    type: 'system',
                     value: '20',
                 },
                 {
+                    type: 'system',
                     value: '40',
                 },
                 {
+                    type: 'system',
                     value: '100',
                 },
                 {
+                    type: 'system',
                     value: '?',
                 },
                 {
+                    type: 'system',
                     value: '☕️',
                 },
             ],
@@ -68,7 +82,7 @@ $websocketConnection = $websocketScheme . $websocketConnection;
 </head>
 
 <body>
-    <div id="app" :class="game.state" v-cloak>
+    <div id="app" class="container-fluid" :class="game.state" v-cloak>
         <audio loop ref="audio">
             <source src="music.mp3" type="audio/mp3">
         </audio>
@@ -93,16 +107,16 @@ $websocketConnection = $websocketScheme . $websocketConnection;
             </div>
         </template>
         <template v-if="session.auth">
-            <div v-if="showAdmin" class="container-fluid pr-5">
+            <div v-if="showAdmin" class="container-fluid pr-md-5">
                 <div class="row mt-3">
-                    <div class="col-6">
+                    <div class="col-12 col-md-4">
                         <h1 class="mb-4">Game Master Control Panel</h1>
-                        <div class="mb-4">
-                            <span class="p-2 bg-secondary text-white" :class="{ 'bg-success' : [game.states.LOBBY, game.states.PLAYING, game.states.SHOWOFF, game.states.FINISHED].includes(game.state) }">LOBBY</span>
-                            <span class="p-2">></span>
-                            <span class="p-2 bg-secondary text-white" :class="{ 'bg-success' : [game.states.PLAYING, game.states.SHOWOFF, game.states.FINISHED].includes(game.state) }">PLAYING / SHOWOFF</span>
-                            <span class="p-2">></span>
-                            <span class="p-2 bg-secondary text-white" :class="{ 'bg-success' : game.state == game.states.FINISHED }">FINISHED</span>
+                        <div class="mb-3">
+                            <span class="d-inline-block p-2 mb-2 bg-secondary text-white" :class="{ 'bg-success' : [game.states.LOBBY, game.states.PLAYING, game.states.SHOWOFF, game.states.FINISHED].includes(game.state) }">LOBBY</span>
+                            <span class="d-inline-block p-2 mb-2">></span>
+                            <span class="d-inline-block p-2 mb-2 bg-secondary text-white" :class="{ 'bg-success' : [game.states.PLAYING, game.states.SHOWOFF, game.states.FINISHED].includes(game.state) }">PLAYING / SHOWOFF</span>
+                            <span class="d-inline-block p-2 mb-2">></span>
+                            <span class="d-inline-block p-2 mb-2 bg-secondary text-white" :class="{ 'bg-success' : game.state == game.states.FINISHED }">FINISHED</span>
                         </div>
                         <div class="mb-4">
                             <div class="mb-2">
@@ -110,7 +124,7 @@ $websocketConnection = $websocketScheme . $websocketConnection;
                             </div>
                             <div class="mb-2">Connected users:</div>
                             <template v-for="user in game.authenticatedPlayers">
-                                <span :key="user" class="p-2 mr-1 rounded" :class="hasUserVoted(user) ? ['bg-success', 'text-white'] : ['bg-light']">{{ user }}</span>
+                                <span :key="user" class="d-inline-block p-2 mr-1 mb-1 rounded" :class="hasUserVoted(user) ? ['bg-success', 'text-white'] : ['bg-light']">{{ user }}</span>
                             </template>
                         </div>
                         <div class="mb-4">
@@ -129,16 +143,16 @@ $websocketConnection = $websocketScheme . $websocketConnection;
                             </button>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-12 col-md-8">
                         <p v-if="game.state !== game.states.SHOWOFF">
                             Showing votes when all players have picked a card, or button "force showoff" is clicked.
                         </p>
-                        <div v-if="game.state === game.states.SHOWOFF" class="votes">
+                        <div v-if="game.state === game.states.SHOWOFF" class="pcard-container">
                             <div class="pcard" v-for="(vote, index) in displayVotes" :key="'vote-'+index">
                                 <div class="pcard__inner">
                                     <div class="pcard__symbol pcard__symbol--big">
                                         <h5 class="card-title text-uppercase">{{ vote.username }}:</h5>
-                                        <p>{{ vote.value }}</p>
+                                        <p class="pcard__value">{{ vote.value }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -155,22 +169,34 @@ $websocketConnection = $websocketScheme . $websocketConnection;
                 </div>
             </div>
             <div v-else-if="game.state === game.states.PLAYING" class="ma-3">
-                <div class="cards">
-                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : game.chosenCard === index }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index">
+                <div class="pcard-container">
+                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(card) }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index">
                         <div class="pcard__inner">
-                            <div class="pcard__symbol pcard__symbol--big" contenteditable @blur="updateCardValue(index, $event)">{{ card.value }}</div>
+                            <div class="pcard__symbol pcard__symbol--big" @blur="updateCardValue(index, $event)">{{ card.value }}</div>
+                        </div>
+                    </button>
+                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(game.customCard) }" @click="select(game.customCard)">
+                        <div class="pcard__inner">
+                            <div class="pcard__symbol pcard__symbol--big">
+                                <span class="bg-white rounded">
+                                    <input v-if="hasVoted && isChosenCard(game.customCard)" type="text" disabled class="pcard__input" v-model="session.chosenCard.value ?? ''">
+                                    <input v-else-if="hasVoted" type="text" disabled class="pcard__input" placeholder="✏️">
+                                    <input v-else type="text" class="pcard__input" v-model="game.customCard.value" @blur="select(game.customCard)" placeholder="✏️" maxlength="12">
+                                </span>
+                            </div>
                         </div>
                     </button>
                 </div>
+                <div class="pb-5 mb-5"><br><br><br></div>
                 <button class="btn btn-primary btn-huge snap-bottom" @click="vote" :disabled="hasVoted">Vote!</button>
             </div>
-            <div v-else-if="game.state === game.states.SHOWOFF" class="ma-3">
-                <div class="votes">
+            <div v-else-if="game.state === game.states.SHOWOFF" class="mt-5 mt-md-2">
+                <div class="pcard-container">
                     <div class="pcard" v-for="(vote, index) in displayVotes" :key="'vote-'+index">
                         <div class="pcard__inner">
                             <div class="pcard__symbol pcard__symbol--big">
-                                <h5 class="card-title text-uppercase">{{ vote.username }}:</h5>
-                                <p>{{ vote.value }}</p>
+                                <h5 class="card-title text-uppercase mb-3">{{ vote.username }}:</h5>
+                                <p class="pcard__value">{{ vote.value }}</p>
                             </div>
                         </div>
                     </div>
