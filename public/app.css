@@ -123,6 +123,10 @@ html {
     font-size: 3rem;
 }
 
+.btn:disabled {
+    pointer-events: none;
+}
+
 .animated-bg {
     width: 100vw;
     height: 100vh;
@@ -140,7 +144,7 @@ html {
 .mute-audio,
 .clear-storage {
     position: fixed;
-    right: 15px;
+    top: 10px;
     background-color: rgb(69, 163, 229);
     color: #fff;
     border-radius: 100%;
@@ -150,11 +154,11 @@ html {
 }
 
 .mute-audio {
-    top: 15px;
+   right: 10px;
 }
 
 .clear-storage {
-    top: 65px;
+    right: 65px;
 }
 
 .mute-audio svg,
@@ -167,13 +171,18 @@ html {
     width: 125px;
 }
 
+.pcard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+
 .pcard {
-    position: relative;
-    display: inline-block;
-    width: 172px;
-    height: 240px;
+    width: 48%;
+    aspect-ratio: 0.670408982;
+    padding: 10px;
     font: 16px 'Trebuchet MS';
-    margin: 10px;
     border-radius: 4px;
     background: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
@@ -192,7 +201,8 @@ html {
 }
 
 .pcard:disabled {
-    opacity: 0.65;
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .pcard--active:disabled {
@@ -202,20 +212,62 @@ html {
 
 .pcard__inner {
     box-sizing: border-box;
-    position: absolute;
     display: -webkit-box;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
     align-items: center;
-    top: 24px;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
+    height: 100%;
+}
+
+.pcard__value {
+    margin: 0;
+    line-height: 1em;
+    word-break: break-all;
+    hyphens: auto;
+}
+
+.pcard__input {
+    width: 100%;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.pcard__input:placeholder-shown {
+    opacity: 0.5;
 }
 
 .pcard__symbol {
-    display: inline-block;
     text-align: center;
-    font-size: 3rem;
+    font-size: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .mute-audio {
+        top: 15px;
+        right: 15px;
+    }
+
+    .clear-storage {
+        top: 65px;
+        right: 15px;
+    }
+
+    .pcard {
+        width: 160px;
+    }
+
+    .pcard__symbol {
+        font-size: 3rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .pcard {
+        width: 180px;
+    }
+
+    .pcard__symbol {
+        font-size: 4rem;
+    }
 }
