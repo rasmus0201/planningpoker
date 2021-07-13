@@ -26,56 +26,70 @@ $websocketConnection = $websocketScheme . $websocketConnection;
             websocketUrl: "<?php echo $websocketConnection; ?>",
             cards: [{
                     type: 'system',
-                    value: '0',
-                },
-                {
-                    type: 'system',
-                    value: '0.5',
-                },
-                {
-                    type: 'system',
                     value: '1',
+                    image: '1',
                 },
                 {
                     type: 'system',
                     value: '2',
+                    image: '2',
                 },
                 {
                     type: 'system',
                     value: '3',
+                    image: '3',
                 },
                 {
                     type: 'system',
                     value: '5',
+                    image: '5',
                 },
                 {
                     type: 'system',
                     value: '8',
+                    image: '8',
                 },
                 {
                     type: 'system',
                     value: '13',
+                    image: '13',
                 },
                 {
                     type: 'system',
                     value: '20',
+                    image: '20',
                 },
                 {
                     type: 'system',
                     value: '40',
+                    image: '40',
                 },
                 {
                     type: 'system',
                     value: '100',
+                    image: '100',
+                },
+                {
+                    type: 'system',
+                    value: '∞',
+                    image: 'infinite',
                 },
                 {
                     type: 'system',
                     value: '?',
+                    image: 'question',
+                },
+                {
+                    type: 'system',
+                    value: '🍰',
+                    image: 'brownie',
                 },
                 {
                     type: 'system',
                     value: '☕️',
+                    image: 'coffee',
                 },
+
             ],
         };
     </script>
@@ -170,9 +184,9 @@ $websocketConnection = $websocketScheme . $websocketConnection;
             </div>
             <div v-else-if="game.state === game.states.PLAYING" class="ma-3">
                 <div class="pcard-container">
-                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(card) }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index">
+                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(card) }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index" :style="setImageStyle(card)">
                         <div class="pcard__inner">
-                            <div class="pcard__symbol pcard__symbol--big" @blur="updateCardValue(index, $event)">{{ card.value }}</div>
+                            <div class="pcard__symbol pcard__symbol--big sr-only">{{ card.value }}</div>
                         </div>
                     </button>
                     <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(game.customCard) }" @click="select(game.customCard)">
