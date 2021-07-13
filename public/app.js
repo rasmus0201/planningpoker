@@ -149,6 +149,10 @@ const app = new Vue({
       return chosen.value === card.value && chosen.type === card.type;
     },
 
+    setImageStyle(card) {
+      return `background-image: url(/public/covers/${card.image}.svg)`;
+    },
+
     updateCardValue(index, event) {
       this.$set(this.game.cards, index, {
         value: event.target.innerText.replace(/(\r\n|\n|\r)/gm, ' ').trim()

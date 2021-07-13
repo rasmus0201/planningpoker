@@ -185,6 +185,7 @@ html {
     font: 16px 'Trebuchet MS';
     border-radius: 4px;
     background: #fff;
+    border: 1px solid #000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
@@ -197,17 +198,12 @@ html {
 .pcard--active {
     color: #fff;
     background-color: #007bff;
-    border-color: #007bff;
+    border: 5px solid #007bff;
 }
 
 .pcard:disabled {
     opacity: 0.6;
     pointer-events: none;
-}
-
-.pcard--active:disabled {
-    background-color: #007bff;
-    border-color: #007bff;
 }
 
 .pcard__inner {
