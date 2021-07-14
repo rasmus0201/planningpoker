@@ -51,8 +51,16 @@ const app = new Vue({
       const votes = [];
       const userVotes = [];
 
+      const cardValuesMap = new Map(this.game.cards.map(card => [card.value, card.image]));
       for (const vote of this.game.votes) {
-        votes.push(vote);
+        const systemCard = cardValuesMap.get(vote.value);
+
+        votes.push({
+          ...vote,
+          type: systemCard ? 'system' : 'user',
+          image: systemCard ?? 'cover',
+        });
+
         userVotes.push(vote.username);
       }
 
@@ -63,7 +71,9 @@ const app = new Vue({
 
         votes.push({
           username: user,
-          value: '-'
+          type: 'system',
+          value: '-',
+          image: 'question'
         });
       }
 
@@ -147,10 +157,6 @@ const app = new Vue({
       }
 
       return chosen.value === card.value && chosen.type === card.type;
-    },
-
-    setImageStyle(card) {
-      return `background-image: url(/public/covers/${card.image}.svg)`;
     },
 
     updateCardValue(index, event) {

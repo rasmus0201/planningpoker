@@ -163,10 +163,10 @@ $websocketConnection = $websocketScheme . $websocketConnection;
                         </p>
                         <div v-if="game.state === game.states.SHOWOFF" class="pcard-container">
                             <div class="pcard" v-for="(vote, index) in displayVotes" :key="'vote-'+index">
-                                <div class="pcard__inner">
+                                <div :class="['pcard__inner', 'pcard__image', `pcard__image--${vote.image}`]">
                                     <div class="pcard__symbol pcard__symbol--big">
-                                        <h5 class="card-title text-uppercase">{{ vote.username }}:</h5>
-                                        <p class="pcard__value">{{ vote.value }}</p>
+                                        <h4 class="pcard__title">{{ vote.username }}</h4>
+                                        <p v-if="vote.type === 'user'" class="pcard__value">{{ vote.value }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -184,8 +184,8 @@ $websocketConnection = $websocketScheme . $websocketConnection;
             </div>
             <div v-else-if="game.state === game.states.PLAYING" class="ma-3">
                 <div class="pcard-container">
-                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(card) }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index" :style="setImageStyle(card)">
-                        <div class="pcard__inner">
+                    <button class="pcard" :disabled="hasVoted" :class="{ 'pcard--active' : isChosenCard(card) }" @click="select(card)" v-for="(card, index) in game.cards" :key="'card-'+index">
+                        <div :class="['pcard__inner', 'pcard__image', `pcard__image--${card.image}`]">
                             <div class="pcard__symbol pcard__symbol--big sr-only">{{ card.value }}</div>
                         </div>
                     </button>
@@ -207,10 +207,10 @@ $websocketConnection = $websocketScheme . $websocketConnection;
             <div v-else-if="game.state === game.states.SHOWOFF" class="mt-5 mt-md-2">
                 <div class="pcard-container">
                     <div class="pcard" v-for="(vote, index) in displayVotes" :key="'vote-'+index">
-                        <div class="pcard__inner">
+                        <div :class="['pcard__inner', 'pcard__image', `pcard__image--${vote.image}`]">
                             <div class="pcard__symbol pcard__symbol--big">
-                                <h5 class="card-title text-uppercase mb-3">{{ vote.username }}:</h5>
-                                <p class="pcard__value">{{ vote.value }}</p>
+                                <h4 class="pcard__title">{{ vote.username }}</h4>
+                                <p v-if="vote.type === 'user'" class="pcard__value">{{ vote.value }}</p>
                             </div>
                         </div>
                     </div>
