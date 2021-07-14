@@ -123,8 +123,13 @@ html {
     font-size: 3rem;
 }
 
+.btn:disabled {
+    pointer-events: none;
+}
+
 .animated-bg {
-    width: 100vw;
+    margin-left: -15px;
+    margin-right: -15px;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -140,7 +145,7 @@ html {
 .mute-audio,
 .clear-storage {
     position: fixed;
-    right: 15px;
+    top: 10px;
     background-color: rgb(69, 163, 229);
     color: #fff;
     border-radius: 100%;
@@ -150,11 +155,11 @@ html {
 }
 
 .mute-audio {
-    top: 15px;
+   right: 10px;
 }
 
 .clear-storage {
-    top: 65px;
+    right: 65px;
 }
 
 .mute-audio svg,
@@ -167,15 +172,22 @@ html {
     width: 125px;
 }
 
+.pcard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+
 .pcard {
     position: relative;
-    display: inline-block;
-    width: 172px;
-    height: 240px;
+    width: 48%;
+    aspect-ratio: 0.670408982;
     font: 16px 'Trebuchet MS';
-    margin: 10px;
+    padding: 0;
     border-radius: 4px;
     background: #fff;
+    border: 1px solid #000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
@@ -188,34 +200,151 @@ html {
 .pcard--active {
     color: #fff;
     background-color: #007bff;
-    border-color: #007bff;
+    border: 5px solid #007bff;
 }
 
 .pcard:disabled {
-    opacity: 0.65;
-}
-
-.pcard--active:disabled {
-    background-color: #007bff;
-    border-color: #007bff;
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .pcard__inner {
     box-sizing: border-box;
-    position: absolute;
     display: -webkit-box;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
     align-items: center;
-    top: 24px;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
+    height: 100%;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.pcard__value {
+    margin: 0;
+    background: #fff;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    padding: 8px;
+    line-height: 1em;
+    word-break: break-all;
+    hyphens: auto;
+}
+
+.pcard__input {
+    width: 100%;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.pcard__input:placeholder-shown {
+    opacity: 0.5;
+}
+
+.pcard__title {
+    position: absolute;
+    display: inline-block;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    background: #fff;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 0;
 }
 
 .pcard__symbol {
-    display: inline-block;
     text-align: center;
-    font-size: 3rem;
+    font-size: 1rem;
+}
+
+.pcard__image {
+    background-size: cover;
+    background-position: center;
+}
+
+.pcard__image--1 {
+    background-image: url(/public/covers/1.svg);
+}
+
+.pcard__image--2 {
+    background-image: url(/public/covers/2.svg);
+}
+
+.pcard__image--3 {
+    background-image: url(/public/covers/3.svg);
+}
+
+.pcard__image--5 {
+    background-image: url(/public/covers/5.svg);
+}
+
+.pcard__image--8 {
+    background-image: url(/public/covers/8.svg);
+}
+
+.pcard__image--13 {
+    background-image: url(/public/covers/13.svg);
+}
+
+.pcard__image--20 {
+    background-image: url(/public/covers/20.svg);
+}
+
+.pcard__image--40 {
+    background-image: url(/public/covers/40.svg);
+}
+
+.pcard__image--100 {
+    background-image: url(/public/covers/100.svg);
+}
+
+.pcard__image--brownie {
+    background-image: url(/public/covers/brownie.svg);
+}
+
+.pcard__image--coffee {
+    background-image: url(/public/covers/coffee.svg);
+}
+
+.pcard__image--cover {
+    background-image: url(/public/covers/cover.svg);
+}
+
+.pcard__image--infinite {
+    background-image: url(/public/covers/infinite.svg);
+}
+
+.pcard__image--question {
+    background-image: url(/public/covers/question.svg);
+}
+
+.pcard__image--yak-shaving {
+    background-image: url(/public/covers/yak-shaving.svg);
+}
+
+@media (min-width: 768px) {
+    .mute-audio {
+        top: 15px;
+        right: 15px;
+    }
+
+    .clear-storage {
+        top: 65px;
+        right: 15px;
+    }
+
+    .pcard {
+        width: 160px;
+    }
+
+    .pcard__symbol {
+        font-size: 3rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .pcard {
+        width: 180px;
+    }
 }
