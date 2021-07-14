@@ -11,6 +11,9 @@ $websocketMap = [
 
 $websocketConnection = isset($websocketMap[$_SERVER['SERVER_ADDR']]) ? $websocketMap[$_SERVER['SERVER_ADDR']] : $websocketMap['127.0.0.1'];
 $websocketConnection = $websocketScheme . $websocketConnection;
+
+$assetVersion = time();
+
 ?>
 <!DOCTYPE html>
 <html lang="da" dir="ltr">
@@ -19,7 +22,7 @@ $websocketConnection = $websocketScheme . $websocketConnection;
     <meta charset="utf-8">
     <title>Planning Poker</title>
     <link rel="stylesheet" href="bootstrap.min.css">
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="app.css?ts=<?php echo $assetVersion; ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         window.PLANNINGPOKER = {
@@ -236,7 +239,7 @@ $websocketConnection = $websocketScheme . $websocketConnection;
         </span>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="app.js" charset="utf-8"></script>
+    <script src="app.js?ts=<?php echo $assetVersion; ?>" charset="utf-8"></script>
 </body>
 
 </html>
