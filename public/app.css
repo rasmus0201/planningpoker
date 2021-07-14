@@ -182,7 +182,7 @@ html {
 .pcard {
     position: relative;
     width: 48%;
-    aspect-ratio: 0.670408982;
+    height: 250px;
     font: 16px 'Trebuchet MS';
     padding: 0;
     border-radius: 4px;
@@ -336,6 +336,7 @@ html {
 
     .pcard {
         width: 160px;
+        height: 244px;
     }
 
     .pcard__symbol {
@@ -346,5 +347,6 @@ html {
 @media (min-width: 1200px) {
     .pcard {
         width: 180px;
+        height: 274px;
     }
 }
