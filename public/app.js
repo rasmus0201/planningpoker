@@ -1,31 +1,39 @@
 Vue.config.devtools = true;
 
 const app = new Vue({
-  el: "#app",
+  el: '#app',
 
   data() {
     return {
       muted: true,
       connection: null,
       session: {
-        clientId: "",
-        username: "",
+        clientId: '',
+        username: '',
         userType: null,
         auth: false,
-        pin: "guldfugl",
+        pin: 'guldfugl',
+        chosenCard: {}, // What card did the user choose
       },
       game: {
         id: null,
         state: null,
         states: {
           NONE: null,
-          LOBBY: "LOBBY",
-          PLAYING: "PLAYING",
-          SHOWOFF: "SHOWOFF",
-          FINISHED: "FINISHED",
+          LOBBY: 'LOBBY',
+          PLAYING: 'PLAYING',
+          SHOWOFF: 'SHOWOFF',
+          FINISHED: 'FINISHED',
         },
         cards: window.PLANNINGPOKER.cards,
-        chosenCard: null, // What card did the user choose
+        defaultCustomCard: {
+          type: 'user',
+          value: ''
+        },
+        customCard: {
+          type: 'user',
+          value: ''
+        },
         votingUsers: [], // Which users have voted
         availableUsers: [], // Users that have not been taking yet
         authenticatedPlayers: [], // Users that are authenticated in the game
@@ -43,8 +51,16 @@ const app = new Vue({
       const votes = [];
       const userVotes = [];
 
+      const cardValuesMap = new Map(this.game.cards.map(card => [card.value, card.image]));
       for (const vote of this.game.votes) {
-        votes.push(vote);
+        const systemCard = cardValuesMap.get(vote.value);
+
+        votes.push({
+          ...vote,
+          type: systemCard ? 'system' : 'user',
+          image: systemCard ?? 'cover',
+        });
+
         userVotes.push(vote.username);
       }
 
@@ -55,7 +71,9 @@ const app = new Vue({
 
         votes.push({
           username: user,
-          value: '-'
+          type: 'system',
+          value: '-',
+          image: 'question'
         });
       }
 
@@ -66,7 +84,7 @@ const app = new Vue({
       return (
         this.connection !== null &&
         this.session.auth === true &&
-        this.session.userType == "gamemaster"
+        this.session.userType == 'gamemaster'
       );
     },
   },
@@ -84,28 +102,28 @@ const app = new Vue({
       auth: false,
     });
 
-    if (this.session.pin.trim() !== "") {
+    if (this.session.pin.trim() !== '') {
       this.join();
     }
   },
 
   methods: {
     startAudio() {
-      if (this.$refs["audio"]) {
-        this.$refs["audio"].currentTime = 0;
-        this.$refs["audio"].play();
+      if (this.$refs['audio']) {
+        this.$refs['audio'].currentTime = 0;
+        this.$refs['audio'].play();
       }
     },
 
     stopAudio() {
-      if (this.$refs["audio"]) {
-        this.$refs["audio"].pause();
-        this.$refs["audio"].currentTime = 0;
+      if (this.$refs['audio']) {
+        this.$refs['audio'].pause();
+        this.$refs['audio'].currentTime = 0;
       }
     },
 
     toggleMute() {
-      if (!this.$refs["audio"]) {
+      if (!this.$refs['audio']) {
         return;
       }
 
@@ -124,22 +142,26 @@ const app = new Vue({
     },
 
     saveSession() {
-      window.sessionStorage.setItem("session", JSON.stringify(this.session));
+      window.sessionStorage.setItem('session', JSON.stringify(this.session));
     },
 
     getSession() {
-      return window.sessionStorage.getItem("session");
+      return window.sessionStorage.getItem('session');
     },
 
-    updateCardValue(index, event) {
-      this.$set(this.game.cards, index, {
-        value: event.target.innerText.replace(/(\r\n|\n|\r)/gm, ' ').trim()
-      });
+    isChosenCard(card) {
+      const chosen = this.session.chosenCard;
+
+      if (chosen == {}) {
+        return false;
+      }
+
+      return chosen.value === card.value && chosen.type === card.type;
     },
 
     join() {
-      if (this.session.pin.trim() == "") {
-        window.alert("Type game pin");
+      if (this.session.pin.trim() == '') {
+        window.alert('Type game pin');
 
         return;
       }
@@ -159,7 +181,7 @@ const app = new Vue({
         window.alert('WebSocket connection closed.');
       };
       this.connection.onerror = function (e) {
-        console.log("ERROR", e);
+        console.log('ERROR', e);
       };
     },
 
@@ -173,7 +195,16 @@ const app = new Vue({
     },
 
     select(card) {
-      this.game.chosenCard = this.game.cards.indexOf(card);
+      this.session.chosenCard = card;
+      this.saveSession();
+    },
+
+    resetChosenCard() {
+      this.select({});
+      this.game.customCard = {
+        type: 'user',
+        value: ''
+      };
     },
 
     hasUserVoted(username) {
@@ -181,58 +212,58 @@ const app = new Vue({
     },
 
     login() {
-      if (this.session.username === "") {
-        window.alert("Select user");
+      if (this.session.username === '') {
+        window.alert('Select user');
         return;
       }
 
-      this.send("login", this.session);
+      this.send('login', this.session);
       this.saveSession();
     },
 
     vote() {
-      if (this.game.chosenCard === null || this.game.chosenCard < 0) {
+      if (this.session.chosenCard == {}) {
         return;
       }
 
-      this.send("vote", {
+
+
+      this.send('vote', {
         clientId: this.session.clientId,
         username: this.session.username,
-        vote: this.game.cards[this.game.chosenCard].value,
+        vote: this.session.chosenCard.value,
       });
-
-      window.sessionStorage.setItem("lastVoteIndex", this.game.chosenCard);
     },
 
     startGame() {
       this.advanceRound();
 
-      this.send("startGame", {
+      this.send('startGame', {
         clientId: this.session.clientId,
       });
     },
 
     finishGame() {
-      this.send("finishGame", {
+      this.send('finishGame', {
         clientId: this.session.clientId,
       });
     },
 
     advanceRound() {
-      this.send("advanceRound", {
+      this.send('advanceRound', {
         clientId: this.session.clientId,
       });
     },
 
     finishRound() {
-      this.send("finishRound", {
+      this.send('finishRound', {
         clientId: this.session.clientId,
       });
     },
 
     onOpen(e) {
       // Automatic login if user have selected username before
-      if (this.session.username !== "") {
+      if (this.session.username !== '') {
         this.login();
       }
     },
@@ -241,30 +272,34 @@ const app = new Vue({
       const { type, data } = JSON.parse(msg.data);
 
       switch (type) {
-        case "setGame":
+        case 'setGame':
           if (data.id) {
             this.game.id = data.id;
           }
 
           if (data.state) {
+            if ([null, this.game.state].includes(this.game.state) === false && data.state === this.game.states.PLAYING) {
+              this.resetChosenCard();
+            }
+
             this.game.state = data.state;
           }
           break;
 
-        case "setVotingUsers":
+        case 'setVotingUsers':
           this.game.votingUsers = data.users;
 
           break;
 
-        case "setAuthenticatedPlayers":
+        case 'setAuthenticatedPlayers':
           this.game.authenticatedPlayers = data.users;
           break;
 
-        case "setAvailableUsers":
+        case 'setAvailableUsers':
           this.game.availableUsers = data.users;
           break;
 
-        case "setSessionData":
+        case 'setSessionData':
           if (data.auth) {
             this.session.auth = data.auth;
           }
@@ -273,24 +308,38 @@ const app = new Vue({
             this.session.userType = data.userType;
           }
 
+          if (this.session.chosenCard.type === 'user') {
+            this.game.customCard = this.session.chosenCard;
+          }
+
           this.saveSession();
           break;
 
-        case "setVotes":
-          window.sessionStorage.setItem("lastVoteIndex", null);
-          this.game.chosenCard = null;
+        case 'setVotes':
+          this.resetChosenCard();
           this.game.votes = data.votes;
           break;
 
-        case "setVote":
+        case 'setVote':
           if (data.vote !== null) {
-            window.sessionStorage.setItem("lastVoteIndex", data.vote);
+            if (this.game.cards.filter(({ value }) => value === data.vote).length === 1) {
+              this.select({
+                type: 'system',
+                value: data.vote
+              });
+            } else {
+              this.select({
+                type: 'user',
+                value: data.vote
+              });
+            }
+
 
             if (!this.hasVoted) {
               this.game.votingUsers.push(this.session.username);
             }
           } else {
-            window.sessionStorage.setItem("lastVoteIndex", null);
+            this.resetChosenCard();
 
             if (this.hasVoted) {
               this.votes.splice(
