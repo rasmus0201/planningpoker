@@ -264,63 +264,63 @@ html {
 }
 
 .pcard__image--1 {
-    background-image: url(/public/covers/1.svg);
+    background-image: url(/covers/1.svg);
 }
 
 .pcard__image--2 {
-    background-image: url(/public/covers/2.svg);
+    background-image: url(/covers/2.svg);
 }
 
 .pcard__image--3 {
-    background-image: url(/public/covers/3.svg);
+    background-image: url(/covers/3.svg);
 }
 
 .pcard__image--5 {
-    background-image: url(/public/covers/5.svg);
+    background-image: url(/covers/5.svg);
 }
 
 .pcard__image--8 {
-    background-image: url(/public/covers/8.svg);
+    background-image: url(/covers/8.svg);
 }
 
 .pcard__image--13 {
-    background-image: url(/public/covers/13.svg);
+    background-image: url(/covers/13.svg);
 }
 
 .pcard__image--20 {
-    background-image: url(/public/covers/20.svg);
+    background-image: url(/covers/20.svg);
 }
 
 .pcard__image--40 {
-    background-image: url(/public/covers/40.svg);
+    background-image: url(/covers/40.svg);
 }
 
 .pcard__image--100 {
-    background-image: url(/public/covers/100.svg);
+    background-image: url(/covers/100.svg);
 }
 
 .pcard__image--brownie {
-    background-image: url(/public/covers/brownie.svg);
+    background-image: url(/covers/brownie.svg);
 }
 
 .pcard__image--coffee {
-    background-image: url(/public/covers/coffee.svg);
+    background-image: url(/covers/coffee.svg);
 }
 
 .pcard__image--cover {
-    background-image: url(/public/covers/cover.svg);
+    background-image: url(/covers/cover.svg);
 }
 
 .pcard__image--infinite {
-    background-image: url(/public/covers/infinite.svg);
+    background-image: url(/covers/infinite.svg);
 }
 
 .pcard__image--question {
-    background-image: url(/public/covers/question.svg);
+    background-image: url(/covers/question.svg);
 }
 
 .pcard__image--yak-shaving {
-    background-image: url(/public/covers/yak-shaving.svg);
+    background-image: url(/covers/yak-shaving.svg);
 }
 
 @media (min-width: 768px) {
