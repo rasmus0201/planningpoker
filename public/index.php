@@ -24,6 +24,7 @@ $assetVersion = time();
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="app.css?ts=<?php echo $assetVersion; ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -33,6 +34,16 @@ $assetVersion = time();
     <meta name="application-name" content="Planningpoker">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="/apple_splash_2048x2732.png" sizes="2048x2732" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_1668x2224.png" sizes="1668x2224" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_1536x2048.png" sizes="1536x2048" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_1242x2208.png" sizes="1242x2208" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_1125x2436.png" sizes="1125x2436" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_750x1334.png" sizes="750x1334" rel="apple-touch-startup-image" />
+    <link href="/apple_splash_640x1136.png" sizes="640x1136" rel="apple-touch-startup-image" />
+
     <script>
         window.PLANNINGPOKER = {
             websocketUrl: "<?php echo $websocketConnection; ?>",

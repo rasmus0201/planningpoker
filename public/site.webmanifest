@@ -1,6 +1,7 @@
 {
     "name": "Planningpoker",
     "short_name": "Planningpoker",
+    "description": "Planningpoker game for SCRUM",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -13,8 +14,9 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "start_url": "https://planningpoker.rasmusbundsgaard.dk/?start=pwa",
-    "display": "standalone"
+    "theme_color": "#B1D9A3",
+    "background_color": "#B1D9A3",
+    "start_url": "/?source=pwa",
+    "display": "standalone",
+    "scope": "/"
 }
