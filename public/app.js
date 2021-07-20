@@ -49,8 +49,13 @@ const app = new Vue({
       return this.game.votingUsers.indexOf(this.session.username) !== -1;
     },
 
-    animatedBg() {
-      return this.session.animatedBg;
+    bodyClass() {
+      const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
+      if (!states.includes(this.game.state) || this.showAdmin) {
+        return '';
+      }
+
+      return this.session.animatedBg ? 'animated-bg' : 'default-bg';
     },
 
     displayVotes() {
@@ -110,6 +115,16 @@ const app = new Vue({
 
     if (this.session.pin.trim() !== '') {
       this.join();
+    }
+  },
+
+
+  watch: {
+    bodyClass: {
+      handler(val) {
+        document.body.className = val;
+      },
+      immediate: true
     }
   },
 

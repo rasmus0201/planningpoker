@@ -36,7 +36,7 @@ $assetVersion = time();
     <meta name="theme-color" content="#ffffff">
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Planningpoker">
     <link rel="apple-touch-startup-image" href="/splash/apple_splash_640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="/splash/apple_splash_750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
@@ -127,13 +127,13 @@ $assetVersion = time();
         </audio>
 
         <template v-if="session.auth === false">
-            <div v-if="game.state === game.states.NONE || !connection" class="join" :class="animatedBg ? 'animated-bg' : 'default-bg'">
+            <div v-if="game.state === game.states.NONE || !connection" class="join content-container">
                 <form class="d-flex" @submit.prevent="join">
                     <input type="tel" placeholder="Game Pin" class="form-control" name="password" v-model="session.pin" />
                     <button type="submit" class="btn btn-primary ml-2">Join!</button>
                 </form>
             </div>
-            <div v-else-if="game.state === game.states.LOBBY || connection" class="lobby" :class="animatedBg ? 'animated-bg' : 'default-bg'">
+            <div v-else-if="game.state === game.states.LOBBY || connection" class="lobby content-container">
                 <div class="d-flex">
                     <select class="form-control mr-2" v-model="session.username" :disabled="game.availableUsers.length === 0">
                         <option value="">Vælg bruger</option>
@@ -199,7 +199,7 @@ $assetVersion = time();
                     </div>
                 </div>
             </div>
-            <div v-else-if="game.state === game.states.LOBBY" class="lobby" :class="animatedBg ? 'animated-bg' : 'default-bg'">
+            <div v-else-if="game.state === game.states.LOBBY" class="lobby content-container">
                 <h1 class="text-white mb-0">Lobby</h1>
                 <div class="p-5">
                     <span v-for="user in game.authenticatedPlayers" :key="user" class="p-3 m-2 rounded bg-white font-weight-bold">{{
@@ -241,7 +241,7 @@ $assetVersion = time();
                     </div>
                 </div>
             </div>
-            <div v-else-if="game.state === game.states.FINISHED" :class="animatedBg ? 'animated-bg' : 'default-bg'">
+            <div v-else-if="game.state === game.states.FINISHED" class="content-container">
                 <h1 class="text-white">Spillet er afsluttet.</h1>
             </div>
         </template>
@@ -260,10 +260,10 @@ $assetVersion = time();
             </svg>
         </span>
         <span class="no-animated-bg" @click="toggleBgAnimation()">
-            <svg v-if="animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
+            <svg v-if="session.animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
                 <path fill="currentColor" d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z" />
             </svg>
-            <svg v-if="!animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="far" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
+            <svg v-if="!session.animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="far" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
                 <path fill="currentColor" d="M464 0H112c-4 0-7.8 2-10 5.4L2 152.6c-2.9 4.4-2.6 10.2.7 14.2l276 340.8c4.8 5.9 13.8 5.9 18.6 0l276-340.8c3.3-4.1 3.6-9.8.7-14.2L474.1 5.4C471.8 2 468.1 0 464 0zm-19.3 48l63.3 96h-68.4l-51.7-96h56.8zm-202.1 0h90.7l51.7 96H191l51.6-96zm-111.3 0h56.8l-51.7 96H68l63.3-96zm-43 144h51.4L208 352 88.3 192zm102.9 0h193.6L288 435.3 191.2 192zM368 352l68.2-160h51.4L368 352z" />
             </svg>
         </span>

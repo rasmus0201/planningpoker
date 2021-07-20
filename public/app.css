@@ -127,20 +127,6 @@ html {
     pointer-events: none;
 }
 
-.animated-bg,
-.default-bg {
-    margin-left: -15px;
-    margin-right: -15px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    flex: 1 0 auto;
-    padding: 0px 0.625rem;
-}
-
 .animated-bg {
     background-color: #528E73;
     animation: 14s ease 0s infinite alternate none running bgcolor;
@@ -148,6 +134,19 @@ html {
 
 .default-bg {
     background-color: #528E73;
+}
+
+.content-container {
+    margin-left: -15px;
+    margin-right: -15px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1 0 auto;
+    padding: 0px 0.625rem;
 }
 
 .mute-audio,
