@@ -127,7 +127,8 @@ html {
     pointer-events: none;
 }
 
-.animated-bg {
+.animated-bg,
+.default-bg {
     margin-left: -15px;
     margin-right: -15px;
     height: 100vh;
@@ -136,14 +137,22 @@ html {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background-color: rgb(69, 163, 229);
     flex: 1 0 auto;
-    animation: 14s ease 0s infinite alternate none running bgcolor;
     padding: 0px 0.625rem;
 }
 
+.animated-bg {
+    background-color: #528E73;
+    animation: 14s ease 0s infinite alternate none running bgcolor;
+}
+
+.default-bg {
+    background-color: #528E73;
+}
+
 .mute-audio,
-.clear-storage {
+.clear-storage,
+.no-animated-bg {
     position: fixed;
     top: 10px;
     background-color: rgb(69, 163, 229);
@@ -162,8 +171,13 @@ html {
     right: 65px;
 }
 
+.no-animated-bg {
+    right: 120px;
+}
+
 .mute-audio svg,
-.clear-storage svg {
+.clear-storage svg,
+.no-animated-bg svg {
     width: 20px;
     height: 20px;
 }
@@ -331,6 +345,11 @@ html {
 
     .clear-storage {
         top: 65px;
+        right: 15px;
+    }
+
+    .no-animated-bg {
+        top: 120px;
         right: 15px;
     }
 

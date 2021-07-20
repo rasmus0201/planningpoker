@@ -5,9 +5,11 @@ const app = new Vue({
 
   data() {
     return {
-      muted: true,
       connection: null,
+      retries: 0,
       session: {
+        muted: true,
+        animatedBg: true,
         clientId: '',
         username: '',
         userType: null,
@@ -45,6 +47,10 @@ const app = new Vue({
   computed: {
     hasVoted() {
       return this.game.votingUsers.indexOf(this.session.username) !== -1;
+    },
+
+    animatedBg() {
+      return this.session.animatedBg;
     },
 
     displayVotes() {
@@ -127,18 +133,25 @@ const app = new Vue({
         return;
       }
 
-      if (this.muted) {
+      if (this.session.muted) {
         this.startAudio();
-        this.muted = false;
+        this.session.muted = false;
       } else {
         this.stopAudio();
-        this.muted = true;
+        this.session.muted = true;
       }
+
+      this.saveSession();
     },
 
     clearStorage() {
       window.sessionStorage.clear();
       window.location.reload();
+    },
+
+    toggleBgAnimation() {
+      this.session.animatedBg = !this.session.animatedBg;
+      this.saveSession();
     },
 
     saveSession() {
@@ -178,7 +191,12 @@ const app = new Vue({
       this.connection.onopen = this.onOpen;
       this.connection.onmessage = this.onMessage;
       this.connection.onclose = () => {
-        window.alert('WebSocket connection closed.');
+        if (this.retries < 3) {
+          this.retries++;
+          this.join();
+        } else {
+          console.log('Could not automatically start WebSocket connection');
+        }
       };
       this.connection.onerror = function (e) {
         console.log('ERROR', e);
