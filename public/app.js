@@ -7,6 +7,7 @@ const app = new Vue({
     return {
       muted: true,
       connection: null,
+      retries: 0,
       session: {
         clientId: '',
         username: '',
@@ -178,7 +179,12 @@ const app = new Vue({
       this.connection.onopen = this.onOpen;
       this.connection.onmessage = this.onMessage;
       this.connection.onclose = () => {
-        window.alert('WebSocket connection closed.');
+        if (this.retries < 3) {
+          this.retries++;
+          this.join();
+        } else {
+          console.log('Could not automatically start WebSocket connection');
+        }
       };
       this.connection.onerror = function (e) {
         console.log('ERROR', e);
