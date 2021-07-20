@@ -51,7 +51,7 @@ const app = new Vue({
 
     bodyClass() {
       const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
-      if (!states.includes(this.game.state) || this.showAdmin) {
+      if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
         return '';
       }
 
