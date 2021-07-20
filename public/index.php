@@ -127,13 +127,13 @@ $assetVersion = time();
         </audio>
 
         <template v-if="session.auth === false">
-            <div v-if="game.state === game.states.NONE || !connection" class="join animated-bg">
+            <div v-if="game.state === game.states.NONE || !connection" class="join" :class="animatedBg ? 'animated-bg' : 'default-bg'">
                 <form class="d-flex" @submit.prevent="join">
                     <input type="tel" placeholder="Game Pin" class="form-control" name="password" v-model="session.pin" />
                     <button type="submit" class="btn btn-primary ml-2">Join!</button>
                 </form>
             </div>
-            <div v-else-if="game.state === game.states.LOBBY || connection" class="lobby animated-bg">
+            <div v-else-if="game.state === game.states.LOBBY || connection" class="lobby" :class="animatedBg ? 'animated-bg' : 'default-bg'">
                 <div class="d-flex">
                     <select class="form-control mr-2" v-model="session.username" :disabled="game.availableUsers.length === 0">
                         <option value="">Vælg bruger</option>
@@ -199,7 +199,7 @@ $assetVersion = time();
                     </div>
                 </div>
             </div>
-            <div v-else-if="game.state === game.states.LOBBY" class="lobby animated-bg">
+            <div v-else-if="game.state === game.states.LOBBY" class="lobby" :class="animatedBg ? 'animated-bg' : 'default-bg'">
                 <h1 class="text-white mb-0">Lobby</h1>
                 <div class="p-5">
                     <span v-for="user in game.authenticatedPlayers" :key="user" class="p-3 m-2 rounded bg-white font-weight-bold">{{
@@ -241,22 +241,30 @@ $assetVersion = time();
                     </div>
                 </div>
             </div>
-            <div v-else-if="game.state === game.states.FINISHED" class="animated-bg">
+            <div v-else-if="game.state === game.states.FINISHED" :class="animatedBg ? 'animated-bg' : 'default-bg'">
                 <h1 class="text-white">Spillet er afsluttet.</h1>
             </div>
         </template>
 
-        <span class="mute-audio" @click="toggleMute">
-            <svg v-if="muted" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="volume-mute" class="svg-inline--fa fa-volume-mute fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <span class="mute-audio" @click="toggleMute()">
+            <svg v-if="session.muted" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="volume-mute" class="svg-inline--fa fa-volume-mute fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                 <path fill="currentColor" d="M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zM461.64 256l45.64-45.64c6.3-6.3 6.3-16.52 0-22.82l-22.82-22.82c-6.3-6.3-16.52-6.3-22.82 0L416 210.36l-45.64-45.64c-6.3-6.3-16.52-6.3-22.82 0l-22.82 22.82c-6.3 6.3-6.3 16.52 0 22.82L370.36 256l-45.63 45.63c-6.3 6.3-6.3 16.52 0 22.82l22.82 22.82c6.3 6.3 16.52 6.3 22.82 0L416 301.64l45.64 45.64c6.3 6.3 16.52 6.3 22.82 0l22.82-22.82c6.3-6.3 6.3-16.52 0-22.82L461.64 256z"></path>
             </svg>
-            <svg v-if="!muted" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="volume-up" class="svg-inline--fa fa-volume-up fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+            <svg v-if="!session.muted" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="volume-up" class="svg-inline--fa fa-volume-up fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                 <path fill="currentColor" d="M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zm233.32-51.08c-11.17-7.33-26.18-4.24-33.51 6.95-7.34 11.17-4.22 26.18 6.95 33.51 66.27 43.49 105.82 116.6 105.82 195.58 0 78.98-39.55 152.09-105.82 195.58-11.17 7.32-14.29 22.34-6.95 33.5 7.04 10.71 21.93 14.56 33.51 6.95C528.27 439.58 576 351.33 576 256S528.27 72.43 448.35 19.97zM480 256c0-63.53-32.06-121.94-85.77-156.24-11.19-7.14-26.03-3.82-33.12 7.46s-3.78 26.21 7.41 33.36C408.27 165.97 432 209.11 432 256s-23.73 90.03-63.48 115.42c-11.19 7.14-14.5 22.07-7.41 33.36 6.51 10.36 21.12 15.14 33.12 7.46C447.94 377.94 480 319.54 480 256zm-141.77-76.87c-11.58-6.33-26.19-2.16-32.61 9.45-6.39 11.61-2.16 26.2 9.45 32.61C327.98 228.28 336 241.63 336 256c0 14.38-8.02 27.72-20.92 34.81-11.61 6.41-15.84 21-9.45 32.61 6.43 11.66 21.05 15.8 32.61 9.45 28.23-15.55 45.77-45 45.77-76.88s-17.54-61.32-45.78-76.86z"></path>
             </svg>
         </span>
-        <span class="clear-storage" @click="clearStorage">
+        <span class="clear-storage" @click="clearStorage()">
             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                 <path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
+            </svg>
+        </span>
+        <span class="no-animated-bg" @click="toggleBgAnimation()">
+            <svg v-if="animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
+                <path fill="currentColor" d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z" />
+            </svg>
+            <svg v-if="!animatedBg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="far" data-icon="gem" class="svg-inline--fa fa-gem fa-w-14" role="img" viewBox="0 0 576 512">
+                <path fill="currentColor" d="M464 0H112c-4 0-7.8 2-10 5.4L2 152.6c-2.9 4.4-2.6 10.2.7 14.2l276 340.8c4.8 5.9 13.8 5.9 18.6 0l276-340.8c3.3-4.1 3.6-9.8.7-14.2L474.1 5.4C471.8 2 468.1 0 464 0zm-19.3 48l63.3 96h-68.4l-51.7-96h56.8zm-202.1 0h90.7l51.7 96H191l51.6-96zm-111.3 0h56.8l-51.7 96H68l63.3-96zm-43 144h51.4L208 352 88.3 192zm102.9 0h193.6L288 435.3 191.2 192zM368 352l68.2-160h51.4L368 352z" />
             </svg>
         </span>
     </div>

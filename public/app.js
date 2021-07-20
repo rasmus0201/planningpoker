@@ -5,10 +5,11 @@ const app = new Vue({
 
   data() {
     return {
-      muted: true,
       connection: null,
       retries: 0,
       session: {
+        muted: true,
+        animatedBg: true,
         clientId: '',
         username: '',
         userType: null,
@@ -46,6 +47,10 @@ const app = new Vue({
   computed: {
     hasVoted() {
       return this.game.votingUsers.indexOf(this.session.username) !== -1;
+    },
+
+    animatedBg() {
+      return this.session.animatedBg;
     },
 
     displayVotes() {
@@ -128,18 +133,25 @@ const app = new Vue({
         return;
       }
 
-      if (this.muted) {
+      if (this.session.muted) {
         this.startAudio();
-        this.muted = false;
+        this.session.muted = false;
       } else {
         this.stopAudio();
-        this.muted = true;
+        this.session.muted = true;
       }
+
+      this.saveSession();
     },
 
     clearStorage() {
       window.sessionStorage.clear();
       window.location.reload();
+    },
+
+    toggleBgAnimation() {
+      this.session.animatedBg = !this.session.animatedBg;
+      this.saveSession();
     },
 
     saveSession() {
