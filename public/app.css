@@ -132,8 +132,16 @@ html {
     animation: 14s ease 0s infinite alternate none running bgcolor;
 }
 
-.default-bg {
+.static-bg {
     background-color: #528E73;
+}
+
+.default-bg {
+    background-color: #fff;
+}
+
+.dark-bg {
+    background-color: #2c3e50;
 }
 
 .content-container {

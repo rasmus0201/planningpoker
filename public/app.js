@@ -52,10 +52,19 @@ const app = new Vue({
     bodyClass() {
       const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
       if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
-        return '';
+        if (this.showAdmin) {
+          return 'default-bg';
+        }
+
+        const mqStandAlone = '(display-mode: standalone), (prefers-color-scheme: dark)';
+        if (navigator.standalone || window.matchMedia(mqStandAlone).matches) {
+          return 'dark-bg';
+        }
+
+        return 'default-bg';
       }
 
-      return this.session.animatedBg ? 'animated-bg' : 'default-bg';
+      return this.session.animatedBg ? 'animated-bg' : 'static-bg';
     },
 
     displayVotes() {
