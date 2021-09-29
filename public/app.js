@@ -1,257 +1,398 @@
 Vue.config.devtools = true;
 
 const app = new Vue({
-    el: '#app',
+  el: '#app',
 
-    data() {
-        return {
-            muted: true,
-            conn: null,
-            availableUsers: [],
-            joined: [],
-            session: {
-                clientId: '',
-                username: '',
-                auth: false,
-            },
-            pendingSync: false,
-            joinedMidGame: false, // If use joins in the middle of someone else playing.
-            chosenCard: null, // What card did the user choose
-            votes: [], // Which users have voted
-            votesData: [], // Which users voted what
-            cards: [
-                {
-                    value: '0',
-                },
-                {
-                    value: '0.5',
-                },
-                {
-                    value: '1',
-                },
-                {
-                    value: '2',
-                },
-                {
-                    value: '3',
-                },
-                {
-                    value: '5',
-                },
-                {
-                    value: '8',
-                },
-                {
-                    value: '13',
-                },
-                {
-                    value: '20',
-                },
-                {
-                    value: '40',
-                },
-                {
-                    value: '100',
-                },
-                {
-                    value: '?',
-                },
-                {
-                    value: '☕️',
-                },
-            ]
-        }
+  data() {
+    return {
+      connection: null,
+      retries: 0,
+      session: {
+        muted: true,
+        animatedBg: true,
+        clientId: '',
+        username: '',
+        userType: null,
+        auth: false,
+        pin: 'guldfugl',
+        chosenCard: {}, // What card did the user choose
+      },
+      game: {
+        id: null,
+        state: null,
+        states: {
+          NONE: null,
+          LOBBY: 'LOBBY',
+          PLAYING: 'PLAYING',
+          SHOWOFF: 'SHOWOFF',
+          FINISHED: 'FINISHED',
+        },
+        cards: window.PLANNINGPOKER.cards,
+        defaultCustomCard: {
+          type: 'user',
+          value: ''
+        },
+        customCard: {
+          type: 'user',
+          value: ''
+        },
+        votingUsers: [], // Which users have voted
+        availableUsers: [], // Users that have not been taking yet
+        authenticatedPlayers: [], // Users that are authenticated in the game
+        votes: [], // Actual votes/cards with data
+      },
+    };
+  },
+
+  computed: {
+    hasVoted() {
+      return this.game.votingUsers.indexOf(this.session.username) !== -1;
     },
 
-    computed: {
-        hasVoted() {
-            return this.votes.indexOf(this.session.username) !== -1;
-        },
-    },
-
-    mounted() {
-        this.stopAudio();
-
-        let clientId = window.localStorage.getItem('clientId');
-
-        if (!clientId) {
-            clientId = Math.random().toString(36).substring(2);
-            window.localStorage.setItem('clientId', clientId);
+    bodyClass() {
+      const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
+      if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
+        if (this.showAdmin) {
+          return 'default-bg';
         }
 
-        this.session.clientId = clientId;
-
-        this.openSocket();
-
-        const lastVoteIndex = window.localStorage.getItem('lastVoteIndex');
-        if (lastVoteIndex !== null && lastVoteIndex !== 'undefined' && parseInt(lastVoteIndex) >= 0) {
-            this.chosenCard = parseInt(lastVoteIndex);
+        const mqStandAlone = '(display-mode: standalone), (prefers-color-scheme: dark)';
+        if (navigator.standalone || window.matchMedia(mqStandAlone).matches) {
+          return 'dark-bg';
         }
+
+        return 'default-bg';
+      }
+
+      return this.session.animatedBg ? 'animated-bg' : 'static-bg';
     },
 
-    methods: {
-        startAudio() {
-            if (this.$refs['audio'] && this.muted === false) {
-                this.$refs['audio'].currentTime = 0;
-                this.$refs['audio'].play();
-            }
-        },
+    displayVotes() {
+      const votes = [];
+      const userVotes = [];
 
-        stopAudio() {
-            if (this.$refs['audio']) {
-                this.$refs['audio'].pause();
-                this.$refs['audio'].currentTime = 0;
-            }
-        },
+      const cardValuesMap = new Map(this.game.cards.map(card => [card.value, card.image]));
+      for (const vote of this.game.votes) {
+        const systemCard = cardValuesMap.get(vote.value);
 
-        muteAudio() {
-            if (this.$refs['audio'] && !this.$refs['audio'].paused) {
-                this.stopAudio();
-            }
+        votes.push({
+          ...vote,
+          type: systemCard ? 'system' : 'user',
+          image: systemCard ?? 'cover',
+        });
 
-            this.muted = !this.muted;
+        userVotes.push(vote.username);
+      }
 
-            if (this.muted === false && (this.pendingSync || (this.hasVoted && !this.votesData.length))) {
-                this.startAudio();
-            }
-        },
+      for (const user of this.game.authenticatedPlayers) {
+        if (userVotes.includes(user)) {
+          continue;
+        }
 
-        clearStorage() {
-            window.localStorage.clear();
-            window.location.reload(true);
-        },
+        votes.push({
+          username: user,
+          type: 'system',
+          value: '-',
+          image: 'question'
+        });
+      }
 
-        openSocket() {
-            this.connection = new WebSocket(window.PLANNINGPOKER.websocketUrl);
+      return votes;
+    },
 
-            this.connection.onopen = this.onOpen;
-            this.connection.onmessage = this.onMessage;
-            this.connection.onclose = () => {
-                setTimeout(this.clearStorage(), 1000);
-            };
-            this.connection.onerror = function(e) { console.log('ERROR', e); };
-        },
+    showAdmin() {
+      return (
+        this.connection !== null &&
+        this.session.auth === true &&
+        this.session.userType == 'gamemaster'
+      );
+    },
+  },
 
-        send(type, data) {
-            let json = {
-                type,
-                data
-            };
+  mounted() {
+    let session = this.getSession();
+    if (!session) {
+      clientId = Math.random().toString(36).substring(2);
 
-            this.connection.send(JSON.stringify(json));
-        },
-
-        join() {
-            if (this.session.username.trim() == '') {
-                return;
-            }
-
-            this.send('join', this.session);
-        },
-
-        select(card) {
-            this.chosenCard = this.cards.indexOf(card);
-        },
-
-        vote() {
-            if (this.chosenCard === null || this.chosenCard < 0) {
-                return;
-            }
-
-            this.send('vote', {
-                clientId: this.session.clientId,
-                username: this.session.username,
-                vote: this.chosenCard,
-            });
-
-            window.localStorage.setItem('lastVoteIndex', this.chosenCard);
-
-            this.votes.push(this.session.username);
-
-            this.startAudio();
-        },
-
-        next() {
-            this.startAudio();
-
-            // Remove votes data
-            this.chosenCard = null;
-            this.votes = [];
-            this.votesData = [];
-            window.localStorage.setItem('lastVoteIndex', null);
-
-            this.pendingSync = true;
-
-            // Send next/"remove vote" message
-            this.send('advance', this.session);
-        },
-
-        onOpen(e) {
-            if (this.session.clientId !== '') {
-                this.send('connect', this.session);
-            }
-        },
-
-        onMessage(msg) {
-            const {type, data} = JSON.parse(msg.data);
-
-            switch (type) {
-                case 'users':
-                    this.availableUsers = data.users;
-                    break;
-                case 'login':
-                    this.session = data.session;
-                    this.pendingSync = (data.session.advanced === true);
-                    this.joinedMidGame = (data.session.midgame_join === true);
-                    this.joined = data.joined;
-                    this.votes = data.votes;
-
-                    // Make sure to update other connections, that this is user actually advanced
-                    if (this.pendingSync) {
-                        this.send('advance', this.session);
-                    }
-
-                    break;
-                case 'join':
-                    if (this.joined.indexOf(data.username) === -1) {
-                        this.joined.push(data.username);
-                    }
-                    break;
-                case 'midgame_join':
-                    this.joinedMidGame = true;
-                    break;
-                case 'leave':
-                    this.joined = data.joined;
-                    this.votes = data.votes;
-
-                    break;
-                case 'vote':
-                    if (this.votes.indexOf(data.username) === -1) {
-                        this.votes.push(data.username);
-                    }
-                    break;
-                case 'finish':
-                    this.joinedMidGame = false;
-                    this.pendingSync = false;
-
-                    // Remove votes data
-                    this.chosenCard = null;
-                    this.votes = [];
-                    this.votesData = [];
-                    window.localStorage.setItem('lastVoteIndex', null);
-
-                    this.stopAudio();
-
-                    break;
-                case 'showoff':
-                    window.localStorage.setItem('lastVoteIndex', null);
-                    this.chosenCard = null;
-                    this.joinedMidGame = false;
-                    this.votesData = data;
-
-                    this.stopAudio();
-                    break;
-            }
-        },
+      this.session.clientId = clientId;
+      this.saveSession();
     }
+
+    this.session = Object.assign({}, JSON.parse(this.getSession()), {
+      auth: false,
+    });
+
+    if (this.session.pin.trim() !== '') {
+      this.join();
+    }
+  },
+
+
+  watch: {
+    bodyClass: {
+      handler(val) {
+        document.body.className = val;
+      },
+      immediate: true
+    }
+  },
+
+  methods: {
+    startAudio() {
+      if (this.$refs['audio']) {
+        this.$refs['audio'].currentTime = 0;
+        this.$refs['audio'].play();
+      }
+    },
+
+    stopAudio() {
+      if (this.$refs['audio']) {
+        this.$refs['audio'].pause();
+        this.$refs['audio'].currentTime = 0;
+      }
+    },
+
+    toggleMute() {
+      if (!this.$refs['audio']) {
+        return;
+      }
+
+      if (this.session.muted) {
+        this.startAudio();
+        this.session.muted = false;
+      } else {
+        this.stopAudio();
+        this.session.muted = true;
+      }
+
+      this.saveSession();
+    },
+
+    clearStorage() {
+      window.sessionStorage.clear();
+      window.location.reload();
+    },
+
+    toggleBgAnimation() {
+      this.session.animatedBg = !this.session.animatedBg;
+      this.saveSession();
+    },
+
+    saveSession() {
+      window.sessionStorage.setItem('session', JSON.stringify(this.session));
+    },
+
+    getSession() {
+      return window.sessionStorage.getItem('session');
+    },
+
+    isChosenCard(card) {
+      const chosen = this.session.chosenCard;
+
+      if (chosen == {}) {
+        return false;
+      }
+
+      return chosen.value === card.value && chosen.type === card.type;
+    },
+
+    join() {
+      if (this.session.pin.trim() == '') {
+        window.alert('Type game pin');
+
+        return;
+      }
+
+      this.openSocket(this.session.pin, this.session.clientId);
+      this.saveSession();
+    },
+
+    openSocket(channel, clientId) {
+      this.connection = new WebSocket(
+        `${window.PLANNINGPOKER.websocketUrl}?channel=${channel}&session[gamepin]=${channel}&session[clientId]=${clientId}`
+      );
+
+      this.connection.onopen = this.onOpen;
+      this.connection.onmessage = this.onMessage;
+      this.connection.onclose = () => {
+        if (this.retries < 3) {
+          this.retries++;
+          this.join();
+        } else {
+          console.log('Could not automatically start WebSocket connection');
+        }
+      };
+      this.connection.onerror = function (e) {
+        console.log('ERROR', e);
+      };
+    },
+
+    send(type, data) {
+      let json = {
+        type,
+        data,
+      };
+
+      this.connection.send(JSON.stringify(json));
+    },
+
+    select(card) {
+      this.session.chosenCard = card;
+      this.saveSession();
+    },
+
+    resetChosenCard() {
+      this.select({});
+      this.game.customCard = {
+        type: 'user',
+        value: ''
+      };
+    },
+
+    hasUserVoted(username) {
+      return this.game.votingUsers.indexOf(username) !== -1;
+    },
+
+    login() {
+      if (this.session.username === '') {
+        window.alert('Select user');
+        return;
+      }
+
+      this.send('login', this.session);
+      this.saveSession();
+    },
+
+    vote() {
+      if (this.session.chosenCard == {}) {
+        return;
+      }
+
+
+
+      this.send('vote', {
+        clientId: this.session.clientId,
+        username: this.session.username,
+        vote: this.session.chosenCard.value,
+      });
+    },
+
+    startGame() {
+      this.advanceRound();
+
+      this.send('startGame', {
+        clientId: this.session.clientId,
+      });
+    },
+
+    finishGame() {
+      this.send('finishGame', {
+        clientId: this.session.clientId,
+      });
+    },
+
+    advanceRound() {
+      this.send('advanceRound', {
+        clientId: this.session.clientId,
+      });
+    },
+
+    finishRound() {
+      this.send('finishRound', {
+        clientId: this.session.clientId,
+      });
+    },
+
+    onOpen(e) {
+      // Automatic login if user have selected username before
+      if (this.session.username !== '') {
+        this.login();
+      }
+    },
+
+    onMessage(msg) {
+      const { type, data } = JSON.parse(msg.data);
+
+      switch (type) {
+        case 'setGame':
+          if (data.id) {
+            this.game.id = data.id;
+          }
+
+          if (data.state) {
+            if ([null, this.game.state].includes(this.game.state) === false && data.state === this.game.states.PLAYING) {
+              this.resetChosenCard();
+            }
+
+            this.game.state = data.state;
+          }
+          break;
+
+        case 'setVotingUsers':
+          this.game.votingUsers = data.users;
+
+          break;
+
+        case 'setAuthenticatedPlayers':
+          this.game.authenticatedPlayers = data.users;
+          break;
+
+        case 'setAvailableUsers':
+          this.game.availableUsers = data.users;
+          break;
+
+        case 'setSessionData':
+          if (data.auth) {
+            this.session.auth = data.auth;
+          }
+
+          if (data.userType) {
+            this.session.userType = data.userType;
+          }
+
+          if (this.session.chosenCard.type === 'user') {
+            this.game.customCard = this.session.chosenCard;
+          }
+
+          this.saveSession();
+          break;
+
+        case 'setVotes':
+          this.resetChosenCard();
+          this.game.votes = data.votes;
+          break;
+
+        case 'setVote':
+          if (data.vote !== null) {
+            if (this.game.cards.filter(({ value }) => value === data.vote).length === 1) {
+              this.select({
+                type: 'system',
+                value: data.vote
+              });
+            } else {
+              this.select({
+                type: 'user',
+                value: data.vote
+              });
+            }
+
+
+            if (!this.hasVoted) {
+              this.game.votingUsers.push(this.session.username);
+            }
+          } else {
+            this.resetChosenCard();
+
+            if (this.hasVoted) {
+              this.votes.splice(
+                this.game.votingUsers.indexOf(this.session.username),
+                1
+              );
+            }
+          }
+
+          break;
+      }
+    },
+  },
 });

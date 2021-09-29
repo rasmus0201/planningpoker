@@ -6,10 +6,12 @@ use App\Events\Event;
 
 class EventDispatcher
 {
+    private Application $app;
     private $listeners = [];
 
-    public function __construct(array $listeners)
+    public function __construct(Application $app, array $listeners)
     {
+        $this->app = $app;
         $this->listeners = $listeners;
     }
 
@@ -21,7 +23,7 @@ class EventDispatcher
         }
 
         foreach ($this->listeners[$class] as $listenerClass) {
-            $listener = new $listenerClass($event);
+            $listener = $this->app->make($listenerClass, ['event' => $event]);
 
             // Only dispatch those listeners which handles the correct type of event
             if ($listener->listen() !== $event->type()) {

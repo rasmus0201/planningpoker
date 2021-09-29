@@ -9,22 +9,17 @@ class PublishAvailableUsers extends Action
     public function run()
     {
         $userRepository = RepositoryFactory::createUser();
-        $users = array_column(
-            $userRepository->getUnconnectedUsers(),
-            'username'
-        );
 
-        $this->event->sendPublisher([
-            'type' => 'users',
-            'data' => [
-                'users' => array_filter(array_unique($users)),
-            ],
-        ]);
+        $usernames = $userRepository->getUnconnectedUsers()
+            ->pluck('username')
+            ->unique()
+            ->filter()
+            ->all();
 
-        $this->event->sendSubscribers([
-            'type' => 'users',
+        $this->event->broadcast([
+            'type' => 'setAvailableUsers',
             'data' => [
-                'users' => array_filter(array_unique($users)),
+                'users' => $usernames,
             ],
         ]);
     }

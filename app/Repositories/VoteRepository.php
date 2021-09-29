@@ -2,56 +2,32 @@
 
 namespace App\Repositories;
 
-use App\Database;
-use PDO;
+use App\Models\GameVote;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VoteRepository extends AbstractRepository
 {
-    public function getVotes()
+    public function getVotes(int $roundId): Collection
     {
-        return Database::run('SELECT u.username, v.vote_id FROM votes v
-            INNER JOIN users u ON u.id = v.user_id
-            WHERE u.connected = 1
-            AND u.is_excluded = 0
-            AND u.clientId IS NOT NULL
-            ORDER BY u.id
-        ')->fetchAll(PDO::FETCH_ASSOC);
+        return GameVote::with([
+            'user' => function (BelongsTo $query) {
+                $query->whereNotNull('client_id');
+            }
+        ])->where('round_id', $roundId)->get();
     }
 
-    public function insertVote($userId, $voteId)
+    public function getUserVote(int $roundId, int $userId): ?GameVote
     {
-        Database::run(
-            'INSERT INTO votes (user_id, vote_id) VALUES (:user_id, :vote_id)',
-            [
-                ':user_id' => $userId,
-                ':vote_id' => $voteId,
-            ]
-        );
+        return GameVote::where('round_id', $roundId)->where('user_id', $userId)->first();
     }
 
-    public function countVotesExcludeByClientId($clientId)
+    public function insertVote(int $roundId, int $userId, string $vote): void
     {
-        $votesCount = Database::run('SELECT COUNT(v.id) as count FROM votes v
-            LEFT JOIN users u ON u.id = v.user_id
-            WHERE u.connected = 1
-            AND u.clientId != :clientId
-            LIMIT 1',
-            [':clientId' => $clientId]
-        )->fetch(PDO::FETCH_ASSOC);
-
-        return (int) $votesCount['count'];
-    }
-
-    public function deleteByUserId($userId)
-    {
-        Database::run(
-            'DELETE FROM votes WHERE user_id = :userId',
-            [':userId', $userId]
-        );
-    }
-
-    public function deleteAll()
-    {
-        Database::run('DELETE FROM votes');
+        GameVote::create([
+            'round_id' => $roundId,
+            'user_id' => $userId,
+            'vote' => $vote,
+        ]);
     }
 }

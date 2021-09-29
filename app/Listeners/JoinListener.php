@@ -2,47 +2,53 @@
 
 namespace App\Listeners;
 
-use App\Actions\ExcludeMidGameJoin;
-use App\Actions\Login;
 use App\Actions\PublishAvailableUsers;
 use App\RepositoryFactory;
+use App\Session;
 
 class JoinListener extends Listener
 {
     public function listen()
     {
-        return 'message:join';
+        return 'open';
     }
 
     public function handle()
     {
-        $clientId = $this->event->data['data']['clientId'] ?? '';
-        $username = $this->event->data['data']['username'] ?? '';
+        $session = Session::fromRequest($this->event->request);
 
-        if (!$clientId || !$username) {
+        $clientId = $session->get('clientId');
+        $gamepin = $session->get('gamepin');
+
+        if (!$clientId || !$gamepin) {
             return;
         }
 
-        $userRepository = RepositoryFactory::createUser();
+        // Check gamepin
+        $gameRepository = RepositoryFactory::createGame();
 
-        if (!$user = $userRepository->getByUsername($username)) {
+        if (!$game = $gameRepository->getByPin($gamepin)) {
             return;
         }
 
-        // Reset user info
-        $userRepository->setClientIdById($user['id'], $clientId);
-        $userRepository->setAdvancedById($user['id'], 0);
-        $userRepository->setExcludedById($user['id'], 0);
+        $connectionRepository = RepositoryFactory::createConnection();
 
-        $loginAction = new Login($this->event);
-        $loginAction->run();
-
-        // If there is already votes in,
-        // Then send a notification saying that you are waiting for results
-        $excludeMidGameJoinAction = new ExcludeMidGameJoin($this->event);
-        $excludeMidGameJoinAction->run();
+        // Create connection
+        $connectionRepository->create(
+            $this->event->getPublisher()->resourceId,
+            $clientId,
+            $game->id
+        );
 
         $publishAvailableUsersAction = new PublishAvailableUsers($this->event);
         $publishAvailableUsersAction->run();
+
+        $this->event->sendPublisher([
+            'type' => 'setGame',
+            'data' => [
+                'id' => $game->id,
+                'state' => $game->state,
+            ]
+        ]);
     }
 }
