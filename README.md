@@ -155,6 +155,8 @@ Currently there is no way of restoring the planning poker games to are pristine 
 0 3 * * * /bin/bash /var/www/${DOMAIN}/cron.sh
 ```
 
+# Contributing
+PRs and issues are welcomed and will be adresssed as soon as possible, but don't expect immediate replies and fixes :sweat_smile:
 
 # Credits:
  - [Redbooth Planning poker card faces](https://github.com/redbooth/scrum-poker-cards) - [License](https://github.com/redbooth/scrum-poker-cards/blob/master/LICENSE)
