@@ -155,6 +155,10 @@ Currently there is no way of restoring the planning poker games to are pristine 
 0 3 * * * /bin/bash /var/www/${DOMAIN}/cron.sh
 ```
 
+### development
+Use Laravel Valet and then to run the Websocket server just open a terminal and type `php app.php` - keep the terminal open when developing. Enjoy!
+
+
 # Contributing
 PRs and issues are welcomed and will be adresssed as soon as possible, but don't expect immediate replies and fixes :sweat_smile:
 
