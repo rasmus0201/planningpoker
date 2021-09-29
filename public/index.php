@@ -114,7 +114,6 @@ $assetVersion = time();
                     value: '☕️',
                     image: 'coffee',
                 },
-
             ],
         };
     </script>
