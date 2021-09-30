@@ -49,6 +49,16 @@ const app = new Vue({
       return this.game.votingUsers.indexOf(this.session.username) !== -1;
     },
 
+    canVote() {
+      return !this.hasVoted && this.session.chosenCard.type;
+    },
+
+    hasChosenCard() {
+      typeof this.session.chosenCard.type !== 'undefined' &&
+        typeof this.session.chosenCard.value !== 'undefined' &&
+        this.session.chosenCard.value.trim() !== '';
+    },
+
     bodyClass() {
       const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
       if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
@@ -187,13 +197,8 @@ const app = new Vue({
     },
 
     isChosenCard(card) {
-      const chosen = this.session.chosenCard;
-
-      if (chosen == {}) {
-        return false;
-      }
-
-      return chosen.value === card.value && chosen.type === card.type;
+      return this.session.chosenCard?.value === card.value &&
+        this.session.chosenCard?.type === card.type;
     },
 
     join() {
@@ -264,11 +269,11 @@ const app = new Vue({
     },
 
     vote() {
-      if (this.session.chosenCard == {}) {
+      if (!this.hasChosenCard) {
         return;
       }
 
-
+      console.log(JSON.stringify(this.session.chosenCard));
 
       this.send('vote', {
         clientId: this.session.clientId,
@@ -375,7 +380,6 @@ const app = new Vue({
                 value: data.vote
               });
             }
-
 
             if (!this.hasVoted) {
               this.game.votingUsers.push(this.session.username);
