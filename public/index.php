@@ -1,11 +1,10 @@
 <?php
 
-// require_once '../bootstrap/migrations.php';
-
 $websocketScheme = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') ? 'ws' : 'wss';
+$websoketPort = config('app.websocket_port');
 
 $websocketMap = [
-    '127.0.0.1' => '://127.0.0.1:9000',
+    '127.0.0.1' => '://127.0.0.1:' . $websoketPort,
     '165.227.174.67' => '://planningpoker.rasmusbundsgaard.dk/websocket',
 ];
 
