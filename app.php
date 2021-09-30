@@ -13,7 +13,7 @@ $server = IoServer::factory(
             new Socket($app)
         )
     ),
-    9000
+    config('app.websocket_port')
 );
 
 $server->run();

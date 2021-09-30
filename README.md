@@ -47,7 +47,7 @@ Then run the migration tool: `php /var/www/${DOMAIN}/bootstrap/migrations.php`.
 
 
 ### Nginx and websocket reverse proxy
-Next up running on nginx you need to setup a virtual host for both the website and the websocket. Replace `${DOMAIN}` with the actual domain name and TLD of you website (So fx. `scrumplanningpoker.com`). Note that the websocket is going to run on port `9000`, so you need to make sure that's available.
+Next up running on nginx you need to setup a virtual host for both the website and the websocket. Replace `${DOMAIN}` with the actual domain name and TLD of you website (So fx. `scrumplanningpoker.com`). Note that the websocket is going to run on port `9000` by default, so you need to make sure that's available.
 
 This assumes you are using [letsencrypt](https://letsencrypt.org/) and probably you want to use [certbot](https://certbot.eff.org/) for managning certicates, and have certificates installed for the domain.
 
