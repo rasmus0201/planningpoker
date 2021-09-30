@@ -53,12 +53,6 @@ const app = new Vue({
       return !this.hasVoted && this.session.chosenCard.type;
     },
 
-    hasChosenCard() {
-      typeof this.session.chosenCard.type !== 'undefined' &&
-        typeof this.session.chosenCard.value !== 'undefined' &&
-        this.session.chosenCard.value.trim() !== '';
-    },
-
     bodyClass() {
       const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
       if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
@@ -120,8 +114,7 @@ const app = new Vue({
   },
 
   mounted() {
-    let session = this.getSession();
-    if (!session) {
+    if (!this.getSession()) {
       clientId = Math.random().toString(36).substring(2);
 
       this.session.clientId = clientId;
@@ -269,7 +262,7 @@ const app = new Vue({
     },
 
     vote() {
-      if (!this.hasChosenCard) {
+      if (!this.canVote) {
         return;
       }
 
