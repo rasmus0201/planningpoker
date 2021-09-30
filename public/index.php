@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/bootstrap/index.php';
+
 $websocketScheme = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') ? 'ws' : 'wss';
 $websoketPort = config('app.websocket_port');
 
@@ -225,7 +227,7 @@ $assetVersion = time();
                     </button>
                 </div>
                 <div class="pb-5 mb-5"><br><br><br></div>
-                <button class="btn btn-primary btn-huge snap-bottom" @click="vote" :disabled="hasVoted">Vote!</button>
+                <button class="btn btn-primary btn-huge snap-bottom" @click="vote()" :disabled="!canVote">Vote!</button>
             </div>
             <div v-else-if="game.state === game.states.SHOWOFF" class="mt-5 mt-md-2">
                 <div class="pcard-container">
