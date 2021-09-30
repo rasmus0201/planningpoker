@@ -8,13 +8,15 @@ const app = new Vue({
       connection: null,
       retries: 0,
       session: {
+        settings: {
+          animatedBg: true,
+          pin: 'guldfugl',
+        },
         muted: true,
-        animatedBg: true,
         clientId: '',
         username: '',
         userType: null,
         auth: false,
-        pin: 'guldfugl',
         chosenCard: {}, // What card did the user choose
       },
       game: {
@@ -54,12 +56,12 @@ const app = new Vue({
     },
 
     bodyClass() {
-      const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
-      if ((this.session.auth && !states.includes(this.game.state)) || this.showAdmin) {
-        if (this.showAdmin) {
-          return 'default-bg';
-        }
+      if (this.showAdmin) {
+        return 'default-bg';
+      }
 
+      const states = [this.game.states.LOBBY, this.game.states.NONE, this.game.states.FINISHED];
+      if (this.session.auth && !states.includes(this.game.state)) {
         const mqStandAlone = '(display-mode: standalone), (prefers-color-scheme: dark)';
         if (navigator.standalone || window.matchMedia(mqStandAlone).matches) {
           return 'dark-bg';
@@ -68,7 +70,7 @@ const app = new Vue({
         return 'default-bg';
       }
 
-      return this.session.animatedBg ? 'animated-bg' : 'static-bg';
+      return this.session.settings.animatedBg ? 'animated-bg' : 'static-bg';
     },
 
     displayVotes() {
@@ -125,11 +127,25 @@ const app = new Vue({
       auth: false,
     });
 
-    if (this.session.pin.trim() !== '') {
+    const localStorage = this.getStorage();
+    if (localStorage) {
+      this.session.settings = Object.assign({}, {
+        muted: true,
+        animatedBg: true,
+        pin: 'guldfugl',
+      }, JSON.parse(localStorage));
+    }
+
+    if (this.session.settings.pin.trim() !== '') {
       this.join();
     }
-  },
 
+    // Can't play a song on first load (user interaction required)
+    if (this.session.muted === false) {
+      this.session.muted = true;
+      this.saveSession();
+    }
+  },
 
   watch: {
     bodyClass: {
@@ -172,13 +188,14 @@ const app = new Vue({
     },
 
     clearStorage() {
+      window.localStorage.clear();
       window.sessionStorage.clear();
       window.location.reload();
     },
 
     toggleBgAnimation() {
-      this.session.animatedBg = !this.session.animatedBg;
-      this.saveSession();
+      this.session.settings.animatedBg = !this.session.settings.animatedBg;
+      this.saveStorage();
     },
 
     saveSession() {
@@ -189,19 +206,28 @@ const app = new Vue({
       return window.sessionStorage.getItem('session');
     },
 
+    saveStorage() {
+      window.localStorage.setItem('storage', JSON.stringify(this.session.settings));
+    },
+
+    getStorage() {
+      return window.localStorage.getItem('storage');
+    },
+
     isChosenCard(card) {
       return this.session.chosenCard?.value === card.value &&
         this.session.chosenCard?.type === card.type;
     },
 
     join() {
-      if (this.session.pin.trim() == '') {
+      if (this.session.settings.pin.trim() == '') {
         window.alert('Type game pin');
 
         return;
       }
 
-      this.openSocket(this.session.pin, this.session.clientId);
+      this.openSocket(this.session.settings.pin, this.session.clientId);
+      this.saveStorage();
       this.saveSession();
     },
 
