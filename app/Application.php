@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App;
 
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -67,7 +66,7 @@ class Application extends Container
      */
     public function register($provider): void
     {
-        if (! $provider instanceof ServiceProvider) {
+        if (!$provider instanceof ServiceProvider) {
             $provider = new $provider($this);
         }
 
@@ -187,7 +186,7 @@ class Application extends Container
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
 
-        $this->singleton('db', function() use ($capsule) {
+        $this->singleton('db', function () use ($capsule) {
             return $capsule;
         });
 

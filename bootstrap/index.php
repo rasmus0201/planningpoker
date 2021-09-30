@@ -35,7 +35,7 @@ $app->singleton(Log::class, function () use ($logger) {
 });
 $app->alias(Log::class, 'log');
 
-$app->singleton(EventDispatcher::class, function(Application $app) {
+$app->singleton(EventDispatcher::class, function (Application $app) {
     return new EventDispatcher($app, config('events'));
 });
 
