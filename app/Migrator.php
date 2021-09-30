@@ -36,7 +36,7 @@ class Migrator
      */
     public function migrate(array $migrations): void
     {
-        foreach($migrations as $migrationName) {
+        foreach ($migrations as $migrationName) {
             $this->requireMigration($migrationName);
 
             $migration = $this->app->make($migrationName);
@@ -56,7 +56,7 @@ class Migrator
     {
         $this->removeMigrationsTable();
 
-        foreach($migrations as $migrationName) {
+        foreach ($migrations as $migrationName) {
             $this->requireMigration($migrationName);
 
             $migration = $this->app->make($migrationName);

@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\EventDispatcher;
-use App\Log;
 use Exception;
 use GuzzleHttp\Psr7\Request;
 use Ratchet\ConnectionInterface;
@@ -39,7 +38,7 @@ abstract class Event
 
         // Sub-typing
         if ($type !== $this->type) {
-            return $this->type.':'.$type;
+            return $this->type . ':' . $type;
         }
 
         return $type;
