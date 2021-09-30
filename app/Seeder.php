@@ -13,6 +13,8 @@ class Seeder
     {
         User::truncate();
         User::insert([
+
+            // Web
             [
                 'name' => 'Kim',
                 'username' => 'kba',
@@ -55,9 +57,58 @@ class Seeder
                 'client_id' => null,
                 'type' => User::TYPE_GAMEMASTER,
             ],
+
+            // Mobile
             [
-                'name' => 'Gæst',
-                'username' => 'guest',
+                'name' => 'Emma',
+                'username' => 'eba',
+                'client_id' => null,
+                'type' => User::TYPE_GAMEMASTER,
+            ],
+            [
+                'name' => 'Anders',
+                'username' => 'aki',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+            [
+                'name' => 'Steffen',
+                'username' => 'asa',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+
+            // App
+            [
+                'name' => 'Torben',
+                'username' => 'tmg',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+            [
+                'name' => 'Peter',
+                'username' => 'pch',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+            [
+                'name' => 'Kasper',
+                'username' => 'kfi',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+
+
+            // Other
+            [
+                'name' => 'Guest player 1',
+                'username' => 'guest1',
+                'client_id' => null,
+                'type' => User::TYPE_PLAYER,
+            ],
+            [
+                'name' => 'Spectator 1',
+                'username' => 'spectator1',
                 'client_id' => null,
                 'type' => User::TYPE_SPECTATOR,
             ],
