@@ -11,6 +11,6 @@ class LocalValetDriver extends BasicValetDriver
      */
     protected function asActualFile($sitePath, $uri)
     {
-        return $sitePath.DIRECTORY_SEPARATOR.'public'.$uri;
+        return $sitePath . DIRECTORY_SEPARATOR . 'public' . $uri;
     }
 }
