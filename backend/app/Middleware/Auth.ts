@@ -10,10 +10,19 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
  * of named middleware.
  */
 export default class AuthMiddleware {
-  /**
-   * The URL to redirect to when request is Unauthorized
-   */
-  protected redirectTo = '/login'
+  public async handle(
+    { auth }: HttpContextContract,
+    next: () => Promise<void>,
+    customGuards: (keyof GuardsList)[]
+  ) {
+    /**
+     * Uses the user defined guards or the default guard mentioned in
+     * the config file
+     */
+    const guards = customGuards.length ? customGuards : [auth.name]
+    await this.authenticate(auth, guards)
+    await next()
+  }
 
   /**
    * Authenticates the current HTTP request against a custom set of defined
@@ -52,25 +61,7 @@ export default class AuthMiddleware {
     throw new AuthenticationException(
       'Unauthorized access',
       'E_UNAUTHORIZED_ACCESS',
-      guardLastAttempted,
-      this.redirectTo,
+      guardLastAttempted
     )
-  }
-
-  /**
-   * Handle request
-   */
-  public async handle (
-    { auth }: HttpContextContract,
-    next: () => Promise<void>,
-    customGuards: (keyof GuardsList)[]
-  ) {
-    /**
-     * Uses the user defined guards or the default guard mentioned in
-     * the config file
-     */
-    const guards = customGuards.length ? customGuards : [auth.name]
-    await this.authenticate(auth, guards)
-    await next()
   }
 }

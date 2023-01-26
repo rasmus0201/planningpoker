@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm'
+import { column, beforeSave, BaseModel, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import Game from './Game'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -28,12 +29,19 @@ export default class User extends BaseModel {
   public updatedAt: DateTime
 
   @column.dateTime()
-  public deletedAt: DateTime
+  public deletedAt: DateTime | null
 
   @beforeSave()
-  public static async hashPassword(user: User) {
-    if (user.$dirty.password) {
+  public static async beforeSave(user: User) {
+    if (user.$dirty.password && user.password !== '') {
       user.password = await Hash.make(user.password)
     }
+
+    if (!user.deletedAt && user.$dirty.password === '' && user.password === '') {
+      user.deletedAt = DateTime.now()
+    }
   }
+
+  @hasMany(() => Game)
+  public games: HasMany<typeof Game>
 }

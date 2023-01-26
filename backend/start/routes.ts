@@ -1,68 +1,41 @@
-/*
-|--------------------------------------------------------------------------
-| Routes
-|--------------------------------------------------------------------------
-|
-| This file is dedicated for defining HTTP routes. A single file is enough
-| for majority of projects, however you can define routes in different
-| files and just make sure to import them inside this file. For example
-|
-| Define routes in following two files
-| ├── start/routes/cart.ts
-| ├── start/routes/customer.ts
-|
-| and then import them inside `start/routes.ts` as follows
-|
-| import './routes/cart'
-| import './routes/customer'
-|
-*/
-
 import Route from '@ioc:Adonis/Core/Route'
-import User from 'App/Models/User'
-import { rules, schema } from '@ioc:Adonis/Core/Validator'
-import { DateTime } from 'luxon'
+import MeController from 'App/Controllers/Http/MeController'
+import AuthController from 'App/Controllers/Http/AuthController'
+import GamesController from 'App/Controllers/Http/GamesController'
 
 Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-Route.post('/api/auth/register', async ({ request, response }) => {
-  const validations = await schema.create({
-    email: schema.string({}, [rules.email(), rules.unique({ table: 'users', column: 'email' })]),
-    password: schema.string({}, [rules.minLength(8)]),
-    username: schema.string({}, [rules.unique({ table: 'users', column: 'username' })]),
+Route.group(() => {
+  Route.group(() => {
+    Route.post('/register', async (ctx) => new AuthController().register(ctx)).middleware('guest')
+    Route.post('/login', async (ctx) => new AuthController().login(ctx)).middleware('guest')
+    Route.post('/logout', async (ctx) => new AuthController().logout(ctx)).middleware('auth')
+
+    Route.post('/forgot-password', async (ctx) => new AuthController().forgotPassword(ctx))
+      .middleware('guest')
+      .as('auth.forgotPassword')
+    Route.post('/reset-password', async (ctx) => new AuthController().resetPassword(ctx))
+      .middleware('guest')
+      .as('auth.resetPassword')
+  }).prefix('/auth')
+
+  Route.group(() => {
+    Route.get('/', async (ctx) => new MeController().view(ctx))
+    Route.patch('/', async (ctx) => new MeController().update(ctx))
+    Route.delete('/', async (ctx) => new MeController().delete(ctx))
+    Route.post('/export', async (ctx) => new MeController().export(ctx))
   })
+    .prefix('/me')
+    .middleware('auth')
 
-  const data = await request.validate({ schema: validations })
-  const user = await User.create(data)
-
-  return response.created(user)
-})
-
-Route.post('/api/auth/login', async ({ auth, request, response }) => {
-  const email = request.input('email')
-  const password = request.input('password')
-
-  try {
-    const token = await auth.use('api').attempt(email, password, {
-      expiresIn: '30 days',
-    })
-
-    const user = await User.findByOrFail('email', email)
-    user.lastActiveAt = DateTime.now()
-    await user.save()
-
-    return response.ok({ token, user })
-  } catch {
-    return response.unauthorized({ error: 'Invalid credentials' })
-  }
-})
-
-Route.post('/api/auth/logout', async ({ auth, response }) => {
-  await auth.use('api').revoke()
-
-  return response.ok({
-    revoked: true,
+  Route.group(() => {
+    Route.get('/', async (ctx) => new GamesController().index(ctx))
+    Route.post('/', async (ctx) => new GamesController().create(ctx))
+    Route.get('/:pin', async (ctx) => new GamesController().view(ctx))
+    Route.delete('/:pin', async (ctx) => new GamesController().delete(ctx))
   })
-})
+    .prefix('/games')
+    .middleware('auth')
+}).prefix('/api')
