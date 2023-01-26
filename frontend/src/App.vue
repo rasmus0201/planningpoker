@@ -1,17 +1,60 @@
 <script setup lang="ts">
-import { io } from "socket.io-client";
+import { usePreferredDark } from "@vueuse/core";
+import { watch } from "vue";
+import { RouterView, useRoute } from "vue-router";
 
-const socket = io('http://127.0.0.1:3333')
-socket.on('news', (data) => {
-  console.log(data)
-  socket.emit('my other event', { my: 'data' })
-})
+import TheFooter from "@/components/TheFooter.vue";
+import TheHeader from "@/components/TheHeader.vue";
+import { useUserStore } from "@/pinia/user";
+
+const userStore = useUserStore();
+const route = useRoute();
+
+const isDarkMode = usePreferredDark();
+
+watch(
+  isDarkMode,
+  (value) => {
+    if (value) {
+      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
-
-  aaaaaaahhhhh
+  <div class="app-view">
+    <template v-if="route.meta.gameLayout">
+      <TheHeader :hide-by-default="true" />
+      <main>
+        <RouterView></RouterView>
+      </main>
+    </template>
+    <template v-else>
+      <TheHeader v-if="userStore.token" />
+      <main class="container is-fluid is-relative">
+        <RouterView></RouterView>
+      </main>
+      <TheFooter />
+    </template>
+  </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.app-view {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+</style>
+
+<style>
+.w-100 {
+  width: 100%;
+}
 </style>

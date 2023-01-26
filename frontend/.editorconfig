@@ -1,0 +1,26 @@
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+indent_size = 2
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Indentation override for js(x), ts(x) and vue files
+[*.{js,jsx,ts,tsx,vue}]
+
+# Indentation override for css related files
+[*.{css,styl,scss,less,sass}]
+
+# Indentation override for html files
+[*.html]
+
+# Trailing space override for markdown file
+[*.md]
+trim_trailing_whitespace = false
+
+# Indentation override for config files
+[*.{json,yml}]

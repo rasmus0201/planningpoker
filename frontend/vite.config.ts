@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
-import mkcert from 'vite-plugin-mkcert'
-import vue from '@vitejs/plugin-vue'
+import vue from "@vitejs/plugin-vue";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import { fileURLToPath, URL } from "url";
+import { defineConfig } from "vite";
+import eslint from "vite-plugin-eslint";
+import mkcert from "vite-plugin-mkcert";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode, ssrBuild }) => {
+export default defineConfig(({ command }) => {
   if (command === "serve") {
     /**
      * Use local development SSL certificate if one exists in ~/.ssl.
@@ -21,14 +23,14 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
       host: "localhost",
       https: {
         key: "",
-        cert: "",
+        cert: ""
       },
       proxy: {
         "/api/*": {
           target: "http://127.0.0.1:3333/",
-          changeOrigin: true,
-        },
-      },
+          changeOrigin: true
+        }
+      }
     };
 
     const sslDir = resolve("~", ".ssl");
@@ -38,25 +40,31 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
     try {
       devServerConfig.https = {
         key: readFileSync(sslKeyPath),
-        cert: readFileSync(sslCertPath),
+        cert: readFileSync(sslCertPath)
       };
     } catch (e) {
-      process.stdout.write(
-        `SSL certificate for "${devServerConfig.host}" not found in ${sslDir}\n\n\n`
-      );
+      process.stdout.write(`SSL certificate for "${devServerConfig.host}" not found in ${sslDir}\n\n\n`);
       process.stdout.write("Please generate one using mkcert:\n\n");
-      process.stdout.write(
-        `$ mkdir -p '${sslDir}' && cd $_ && mkcert -install ${devServerConfig.host}\n\n\n`
-      );
+      process.stdout.write(`$ mkdir -p '${sslDir}' && cd $_ && mkcert -install ${devServerConfig.host}\n\n\n`);
     }
 
     return {
-      plugins: [mkcert(), vue()],
-      server: devServerConfig
+      plugins: [mkcert(), vue(), eslint()],
+      server: devServerConfig,
+      resolve: {
+        alias: {
+          "@": fileURLToPath(new URL("./src", import.meta.url))
+        }
+      }
     };
   }
 
   return {
-    plugins: [vue()],
+    plugins: [vue(), eslint()],
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url))
+      }
+    }
   };
 });
