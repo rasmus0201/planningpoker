@@ -11,10 +11,10 @@ export default class extends BaseSchema {
       table.string('password', 180).notNullable()
       table.string('remember_me_token').nullable()
 
-      table.timestamp('last_active_at', { useTz: false })
-      table.timestamp('created_at', { useTz: false }).notNullable()
-      table.timestamp('updated_at', { useTz: false }).notNullable()
-      table.timestamp('deleted_at', { useTz: false })
+      table.timestamp('last_active_at').nullable()
+      table.timestamp('created_at').notNullable().defaultTo(this.now())
+      table.timestamp('updated_at').notNullable().defaultTo(this.now())
+      table.timestamp('deleted_at').nullable()
     })
   }
 

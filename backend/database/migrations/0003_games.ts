@@ -10,8 +10,8 @@ export default class extends BaseSchema {
       table.string('title')
       table.string('pin').unique()
       table.string('state')
-      table.timestamp('created_at', { useTz: false })
-      table.timestamp('updated_at', { useTz: false })
+      table.timestamp('created_at').notNullable().defaultTo(this.now())
+      table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
   }
 

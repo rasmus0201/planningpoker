@@ -9,8 +9,8 @@ export default class extends BaseSchema {
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.integer('game_id').unsigned().references('id').inTable('games').onDelete('CASCADE')
       table.string('label')
-      table.timestamp('created_at', { useTz: false })
-      table.timestamp('updated_at', { useTz: false })
+      table.timestamp('created_at').notNullable().defaultTo(this.now())
+      table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
   }
 

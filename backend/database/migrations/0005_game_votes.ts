@@ -14,8 +14,8 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.string('vote')
-      table.timestamp('created_at', { useTz: false })
-      table.timestamp('updated_at', { useTz: false })
+      table.timestamp('created_at').notNullable().defaultTo(this.now())
+      table.timestamp('updated_at').notNullable().defaultTo(this.now())
 
       table.unique(['round_id', 'user_id'])
     })
