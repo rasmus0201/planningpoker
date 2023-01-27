@@ -16,8 +16,8 @@ export interface Session {
 }
 
 class SessionStore {
-  public findSession(id: string) {}
-  public saveSession(id: string, session: Session) {}
+  public findSession(_id: string) {}
+  public saveSession(_id: string, _session: Session) {}
   public findAllSessions() {}
 }
 
