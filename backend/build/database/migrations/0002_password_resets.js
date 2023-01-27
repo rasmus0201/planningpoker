@@ -14,9 +14,9 @@ class default_1 extends Schema_1.default {
             table.increments('id');
             table.string('email');
             table.string('token');
-            table.timestamp('expired_at', { useTz: false });
-            table.timestamp('created_at', { useTz: false });
-            table.timestamp('updated_at', { useTz: false });
+            table.timestamp('expired_at').nullable();
+            table.timestamp('created_at').notNullable().defaultTo(this.now());
+            table.timestamp('updated_at').notNullable().defaultTo(this.now());
         });
     }
     async down() {

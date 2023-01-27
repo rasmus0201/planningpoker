@@ -16,8 +16,8 @@ class default_1 extends Schema_1.default {
             table.string('name').notNullable();
             table.string('type').notNullable();
             table.string('token', 64).notNullable().unique();
-            table.timestamp('expires_at', { useTz: true }).nullable();
-            table.timestamp('created_at', { useTz: true }).notNullable();
+            table.timestamp('expires_at').nullable();
+            table.timestamp('created_at').notNullable().defaultTo(this.now());
         });
     }
     async down() {

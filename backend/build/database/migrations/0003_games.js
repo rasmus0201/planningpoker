@@ -16,8 +16,8 @@ class default_1 extends Schema_1.default {
             table.string('title');
             table.string('pin').unique();
             table.string('state');
-            table.timestamp('created_at', { useTz: false });
-            table.timestamp('updated_at', { useTz: false });
+            table.timestamp('created_at').notNullable().defaultTo(this.now());
+            table.timestamp('updated_at').notNullable().defaultTo(this.now());
         });
     }
     async down() {
