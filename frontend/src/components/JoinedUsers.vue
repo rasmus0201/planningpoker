@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <div class="is-flex is-flex-direction-column">
-    <div v-for="user in users" :key="user.userId" class="active-user">
+    <div v-for="user in users.filter((u) => u.connected)" :key="`${user.userId}-${user.connected}`" class="active-user">
       <span
         class="active-user__dot"
         :class="user.connected ? 'has-background-success' : 'has-background-warning'"

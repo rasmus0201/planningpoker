@@ -39,6 +39,7 @@ const onAccountUpdate = async () => {
   }
 };
 
+const exportedData = ref<string>("");
 const onExport = async () => {
   state.value = "loading";
   try {
@@ -51,7 +52,9 @@ const onExport = async () => {
       throw new Error();
     }
 
-    window.alert("We will send you an email with the exported data once it's ready.");
+    const json = await response.json();
+
+    exportedData.value = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json.export, null, 2));
 
     state.value = "success";
   } catch (error) {
@@ -128,6 +131,7 @@ const onErasure = async () => {
               <button class="button is-info" :disabled="state === 'loading'" @click.prevent="onExport()">
                 Export account
               </button>
+              <a v-if="exportedData" :href="exportedData" download="user.json">Download export</a>
             </div>
           </div>
 

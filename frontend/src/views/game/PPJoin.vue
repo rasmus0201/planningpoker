@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import { API_URL } from "@/config";
 import { useUserStore } from "@/pinia/user";
 import type { Game } from "@/types";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 
 const pin = ref("");
@@ -27,6 +28,10 @@ const autofocus = (e: KeyboardEvent) => {
 
 onMounted(() => {
   window.addEventListener("keydown", autofocus);
+
+  if (route.query.pin) {
+    pin.value = route.query.pin.toString();
+  }
 });
 
 onBeforeUnmount(() => {

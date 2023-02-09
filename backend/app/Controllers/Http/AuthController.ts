@@ -17,6 +17,11 @@ export default class AuthController {
     })
 
     const data = await request.validate({ schema: validations })
+
+    if (data.username.startsWith('DELETED@')) {
+      throw new Error('Username not allowed')
+    }
+
     const user = await User.create(data)
 
     const token = await auth.use('api').generate(user)

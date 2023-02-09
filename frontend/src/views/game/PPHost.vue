@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import QrCode from "@chenfengyuan/vue-qrcode";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
@@ -65,6 +66,18 @@ onMounted(async () => {
   }
 });
 
+const gameJoinUrl = computed(
+  () =>
+    new URL(
+      router.resolve({
+        name: "game.join",
+        query: { pin: game.value?.pin }
+      }).href,
+      window.location.origin
+    ).href
+);
+const qrContainer = ref<HTMLElement | undefined>();
+
 socket.on("game lobby", () => setGameState("lobby"));
 socket.on("game voting", () => setGameState("voting"));
 socket.on("game reveal", () => setGameState("reveal"));
@@ -87,6 +100,7 @@ socket.on("game reveal", (votes: UserPokerCard[]) => {
 });
 
 socket.on("game voting", () => {
+  votingUsers.value = [];
   revealedCards.value = [];
 });
 </script>
@@ -101,12 +115,20 @@ socket.on("game voting", () => {
         <div v-if="hasAnyAction" class="is-flex is-flex-direction-column">
           <button v-if="canStartGame" class="button is-success mb-3" @click="onStartGame()">Start game</button>
           <button v-if="canForceReveal" class="button is-warning mb-3" @click="onForceReveal()">Force reveal</button>
-          <button v-if="canContinueGame" class="button is-success mb-3" @click="onContinueGame()">Continue</button>
+          <button v-if="canContinueGame" class="button is-success mb-3" @click="onContinueGame()">Next round</button>
           <button v-if="canFinishGame" class="button is-danger mb-3" @click="onFinishGame()">Finish</button>
         </div>
         <p class="menu-label">Joined Users:</p>
         <JoinedUsers :users="users" />
         <button class="button is-small is-warning mt-5" @click="onDeleteSession()">Delete session</button>
+
+        <div ref="qrContainer" class="mt-5">
+          <QrCode
+            v-if="qrContainer"
+            :value="gameJoinUrl"
+            :options="{ width: qrContainer.clientWidth, margin: 0 }"
+          ></QrCode>
+        </div>
       </div>
     </aside>
 

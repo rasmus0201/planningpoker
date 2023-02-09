@@ -28,7 +28,7 @@ Route.group(() => {
     Route.post('/export', async (ctx) => new MeController().export(ctx))
   })
     .prefix('/me')
-    .middleware('auth')
+    .middleware(['auth', 'userActive'])
 
   Route.group(() => {
     Route.get('/', async (ctx) => new GamesController().index(ctx))
@@ -37,5 +37,5 @@ Route.group(() => {
     Route.delete('/:pin', async (ctx) => new GamesController().delete(ctx))
   })
     .prefix('/games')
-    .middleware('auth')
+    .middleware(['auth', 'userActive'])
 }).prefix('/api')

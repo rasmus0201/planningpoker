@@ -2,7 +2,7 @@ import { AuthenticationException } from '@adonisjs/auth/build/standalone'
 import type { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class AuthMiddleware {
+export default class GuestMiddleware {
   public async handle(
     { auth }: HttpContextContract,
     next: () => Promise<void>,

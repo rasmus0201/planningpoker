@@ -63,6 +63,7 @@
     "@adonisjs/view": "^6.2.0",
     "luxon": "^3.2.1",
     "mysql2": "^3.0.1",
+    "node-schedule": "^2.1.1",
     "pem": "^1.14.6",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",

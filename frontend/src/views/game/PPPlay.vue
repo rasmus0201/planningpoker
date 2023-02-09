@@ -92,6 +92,12 @@ socket.on("game reveal", (votes: UserPokerCard[]) => {
   hasVoted.value = false;
   activeCard.value = "";
 });
+
+socket.on("game voting", () => {
+  revealedCards.value = [];
+  hasVoted.value = false;
+  activeCard.value = "";
+});
 </script>
 
 <template>

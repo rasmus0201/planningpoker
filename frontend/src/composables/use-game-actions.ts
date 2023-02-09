@@ -4,7 +4,7 @@ import type { AuthenticatableSocket, Game } from "@/types";
 
 export function useGameActions(game: Ref<Game | undefined>, socket: AuthenticatableSocket) {
   const canStartGame = computed(() => game.value?.state === "lobby");
-  const canContinueGame = computed(() => game.value?.state === "reveal");
+  const canContinueGame = computed(() => game.value?.state === "voting" || game.value?.state === "reveal");
   const canForceReveal = computed(() => game.value?.state === "voting");
   const canFinishGame = computed(() => game.value?.state !== "finished");
 

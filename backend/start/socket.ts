@@ -92,7 +92,7 @@ io.use(async (socket: AuthenticatableSocket, next) => {
   }
 
   const joinType = socket.handshake.auth.joinType
-  if (!token) {
+  if (!joinType) {
     return next(new Error('No join type'))
   }
 
@@ -310,6 +310,17 @@ io.on('connection', async (socket: AuthenticatableSocket) => {
     sendGameRevealEvent(votes, socket, 'broadcast')
   })
 
+  socket.on('game forceContinue', async () => {
+    if (socket.joinType !== 'host') {
+      return
+    }
+
+    const game = (await Game.findBy('pin', socket.gamePin))!
+    game.state = 'voting'
+
+    await game.save()
+  })
+
   socket.on('game continue', async () => {
     if (socket.joinType !== 'host') {
       return
@@ -402,9 +413,6 @@ io.on('connection', async (socket: AuthenticatableSocket) => {
   socket.on('disconnect', async () => {
     const matchingSockets = await io.in(socket.userId).fetchSockets()
     if (matchingSockets.length === 0) {
-      // Notify other users
-      socket.broadcast.to(socket.gamePin).emit('user disconnected', socket.userId)
-
       // Update the connection status of the session
       sessionStore.saveSession(socket.sessionId, {
         sessionId: socket.sessionId,
@@ -417,6 +425,9 @@ io.on('connection', async (socket: AuthenticatableSocket) => {
         disconnectedAt: DateTime.now().toMillis(),
         connected: false,
       })
+
+      // Notify other users
+      socket.broadcast.to(socket.gamePin).emit('user disconnected', socket.userId)
     }
   })
 })

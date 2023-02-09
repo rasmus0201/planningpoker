@@ -2,6 +2,8 @@ import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Game from './Game'
+import GameVote from './GameVote'
+import ApiToken from './ApiToken'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -42,6 +44,12 @@ export default class User extends BaseModel {
     }
   }
 
+  @hasMany(() => ApiToken)
+  public apiTokens: HasMany<typeof ApiToken>
+
   @hasMany(() => Game)
   public games: HasMany<typeof Game>
+
+  @hasMany(() => GameVote)
+  public gameVotes: HasMany<typeof GameVote>
 }

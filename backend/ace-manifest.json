@@ -1,5 +1,39 @@
 {
   "commands": {
+    "cleanup:unfinished-games": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "./commands/CleanupUnfinishedGames",
+      "commandName": "cleanup:unfinished-games",
+      "description": "",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
+    "cleanup:users": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "./commands/CleanupUsers",
+      "commandName": "cleanup:users",
+      "description": "",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
+    "schedule": {
+      "settings": {
+        "loadApp": true,
+        "stayAlive": true
+      },
+      "commandPath": "./commands/Scheduler",
+      "commandName": "schedule",
+      "description": "",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
     "dump:rcfile": {
       "settings": {},
       "commandPath": "@adonisjs/core/build/commands/DumpRc",

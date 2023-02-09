@@ -74,6 +74,7 @@ socket.on("game reveal", (votes: UserPokerCard[]) => {
 });
 
 socket.on("game voting", () => {
+  votingUsers.value = [];
   revealedCards.value = [];
 });
 </script>

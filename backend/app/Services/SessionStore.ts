@@ -58,8 +58,8 @@ export class InMemorySessionStore extends SessionStore {
           return session
         }
 
-        // 60 seconds grace period to be offline from the socket.
-        if (DateTime.now().minus({ seconds: 60 }).toMillis() <= session.disconnectedAt) {
+        // 2 hours grace period to be offline from the socket.
+        if (DateTime.now().minus({ minutes: 120 }).toMillis() <= session.disconnectedAt) {
           return session
         }
 

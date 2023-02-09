@@ -12,8 +12,23 @@ export function useGameTokens(socket: AuthenticatableSocket) {
   const tokenContainer = ref<HTMLElement>();
 
   socket.on("token moved", (e: UserToken) => {
-    userTokens.value = userTokens.value.filter((u): u is UserToken => u.user.userId !== e.user.userId);
-    userTokens.value.push(e);
+    const index = userTokens.value.findIndex((u) => u.user.userId === e.user.userId);
+    if (index === -1) {
+      userTokens.value.push(e);
+      return;
+    }
+
+    userTokens.value = userTokens.value.map((u) => {
+      if (u.user.userId !== e.user.userId) {
+        return u;
+      }
+
+      return e;
+    });
+  });
+
+  socket.on("user disconnected", (userId: string) => {
+    userTokens.value = userTokens.value.filter((u) => u.user.userId !== userId);
   });
 
   socket.on("session", () => {
@@ -39,6 +54,7 @@ export function useGameTokens(socket: AuthenticatableSocket) {
 
   onBeforeUnmount(() => {
     socket.off("token moved");
+    socket.off("user disconnected");
     socket.off("session");
     socket.off("game voting");
   });

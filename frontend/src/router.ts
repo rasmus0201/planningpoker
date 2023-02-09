@@ -11,6 +11,7 @@ import PPJoin from "@/views/game/PPJoin.vue";
 import PPPlay from "@/views/game/PPPlay.vue";
 import PPSpectate from "@/views/game/PPSpectate.vue";
 import PPAccountSettings from "@/views/PPAccountSettings.vue";
+import PPCredits from "@/views/PPCredits.vue";
 import PPHome from "@/views/PPHome.vue";
 import PPLegal from "@/views/PPLegal.vue";
 
@@ -46,7 +47,8 @@ const routes = [
   { path: "/forgot-password", name: "auth.forgotPassword", component: PPForgotPassword },
   { path: "/reset-password", name: "auth.resetPassword", component: PPResetPassword },
 
-  { path: "/legal", name: "legal", component: PPLegal }
+  { path: "/legal", name: "legal", component: PPLegal },
+  { path: "/credits", name: "credits", component: PPCredits }
 ];
 
 const router = createRouter({

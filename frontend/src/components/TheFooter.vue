@@ -7,7 +7,8 @@ import { RouterLink } from "vue-router";
     <div class="content has-text-centered">
       <p>
         <strong>PlanningPoker</strong> by <a href="https://rasmusbundsgaard.dk">Rasmus Bundsgaard</a> &copy;
-        {{ new Date().getFullYear() }}. <RouterLink :to="{ name: 'legal' }">Privacy & Cookies</RouterLink>
+        {{ new Date().getFullYear() }}. <RouterLink :to="{ name: 'legal' }">Privacy & Cookies</RouterLink>.
+        <RouterLink :to="{ name: 'credits' }">Credits</RouterLink>
       </p>
     </div>
   </footer>

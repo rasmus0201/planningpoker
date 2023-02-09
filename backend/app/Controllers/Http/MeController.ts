@@ -1,5 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { rules, schema } from '@ioc:Adonis/Core/Validator'
+import UserCleanUp from 'App/Services/UserCleanUp'
+import { DateTime } from 'luxon'
 
 export default class MeController {
   public async view({ response, auth }: HttpContextContract) {
@@ -33,6 +35,10 @@ export default class MeController {
     const data = await request.validate({ schema: validations })
 
     if (data.username) {
+      if (data.username.startsWith('DELETED@')) {
+        throw new Error('Username not allowed')
+      }
+
       auth.user.username = data.username
     }
 
@@ -56,11 +62,9 @@ export default class MeController {
       return response.unauthorized()
     }
 
-    auth.user.username = `DELETED@${auth.user.id}`
-    auth.user.email = `DELETED@${auth.user.id}`
-    auth.user.password = ''
+    const userCleanUpService = new UserCleanUp()
 
-    await auth.user.save()
+    await userCleanUpService.run(auth.user)
     await auth.use('api').revoke()
 
     return response.json({ message: 'User deleted' })
@@ -71,8 +75,10 @@ export default class MeController {
       return response.unauthorized()
     }
 
-    // TODO
+    // Load relations
+    await auth.user.load('games')
+    await auth.user.load('gameVotes')
 
-    return response.json({ message: 'Exported data' })
+    return response.json({ message: 'Exported data', export: auth.user.toJSON() })
   }
 }
