@@ -18,7 +18,7 @@ defineProps<{
 .poker-card {
   position: relative;
   width: 48%;
-  height: 250px;
+  aspect-ratio: 0.685;
   font: 16px "Trebuchet MS";
   padding: 0;
   border-radius: 4px;
@@ -36,13 +36,14 @@ defineProps<{
   align-items: center;
   height: 100%;
   padding: 10px;
+  border-radius: 3px;
 }
 
 .poker-card__title {
   position: absolute;
   display: inline-block;
-  top: 10px;
-  right: 10px;
+  top: 2px;
+  right: 2px;
   font-size: 1.5rem;
   background: #fff;
   border-radius: 2px;
@@ -64,7 +65,6 @@ defineProps<{
 @media (min-width: 768px) {
   .poker-card {
     width: 160px;
-    height: 244px;
   }
 
   .poker-card__symbol {
@@ -75,7 +75,6 @@ defineProps<{
 @media (min-width: 1200px) {
   .poker-card {
     width: 180px;
-    height: 274px;
   }
 }
 </style>

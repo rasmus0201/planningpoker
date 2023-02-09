@@ -10,10 +10,7 @@ defineProps<{
 <template>
   <div class="is-flex is-flex-direction-column">
     <div v-for="user in users.filter((u) => u.connected)" :key="`${user.userId}-${user.connected}`" class="active-user">
-      <span
-        class="active-user__dot"
-        :class="user.connected ? 'has-background-success' : 'has-background-warning'"
-      ></span>
+      <span class="active-user__dot" :class="user.self ? 'has-background-info' : 'has-background-success'"></span>
       <span>{{ user.username }} ({{ mapJoinType(user.joinType) }})</span>
     </div>
   </div>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { UsePreferredDark } from "@vueuse/components";
 import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 
 const props = withDefaults(
   defineProps<{
@@ -10,8 +10,14 @@ const props = withDefaults(
   { hideByDefault: false }
 );
 
+const router = useRouter();
+
 const isHeaderHidden = ref(props.hideByDefault);
 const isMenuOpen = ref(false);
+
+router.afterEach(() => {
+  isMenuOpen.value = false;
+});
 </script>
 
 <template>

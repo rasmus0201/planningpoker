@@ -134,7 +134,8 @@ socket.on("game voting", () => {
 
     <section v-if="gameState == 'lobby'" class="column is-relative is-12-mobile is-10">
       <div class="py-4">
-        <h1 class="title is-1 has-text-centered">{{ game.pin }}</h1>
+        <!-- Split pin in middle for easier reading -->
+        <h1 class="title is-1 has-text-centered">{{ `${game.pin.slice(0, 3)} ${game.pin.slice(3, 6)}` }}</h1>
       </div>
       <div ref="tokenContainer" class="token-container">
         <div
@@ -156,19 +157,23 @@ socket.on("game voting", () => {
     <section v-if="gameState === 'voting'" class="column is-relative is-12-mobile is-10">
       <div class="poker-cards-container">
         <p v-if="votingUsers?.length === 0" class="title">Please vote 🙃</p>
-        <PokerCardBack v-for="(card, i) in votingUsers" :key="i" :username="card.username.substring(0, 3)" />
+        <TransitionGroup name="list" tag="div" class="poker-cards-container__inner">
+          <PokerCardBack v-for="(card, i) in votingUsers" :key="i" :username="card.username.substring(0, 3)" />
+        </TransitionGroup>
       </div>
     </section>
 
     <section v-if="gameState === 'reveal'" class="column is-relative is-12-mobile is-10">
       <div class="poker-cards-container">
         <p v-if="revealedCards?.length === 0" class="title">Nobody voted 🙃</p>
-        <PokerCard
-          v-for="(card, i) in revealedCards"
-          :key="i"
-          :card="card.vote"
-          :username="card.username.substring(0, 3)"
-        />
+        <TransitionGroup name="list" tag="div" class="poker-cards-container__inner">
+          <PokerCard
+            v-for="(card, i) in revealedCards"
+            :key="i"
+            :card="card.vote"
+            :username="card.username.substring(0, 3)"
+          />
+        </TransitionGroup>
       </div>
     </section>
 
@@ -182,6 +187,24 @@ socket.on("game voting", () => {
 </template>
 
 <style lang="scss" scoped>
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.list-leave-active {
+  position: absolute;
+}
+
 .host-container {
   min-height: 100vh;
 }
@@ -218,10 +241,13 @@ socket.on("game voting", () => {
 }
 
 .poker-cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   padding: 10px;
   margin-bottom: 125px;
+
+  &__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 }
 </style>

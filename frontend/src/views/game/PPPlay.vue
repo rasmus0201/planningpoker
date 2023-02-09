@@ -5,17 +5,11 @@ import { RouterLink, useRoute, useRouter } from "vue-router";
 import DraggableTokenCanvas from "@/components/DraggableTokenCanvas.vue";
 import JoinedUsers from "@/components/JoinedUsers.vue";
 import PokerCard from "@/components/PokerCard.vue";
+import PokerCardWritable from "@/components/PokerCardWritable.vue";
 import { useGameUsers, useSocket } from "@/composables";
 import { API_URL } from "@/config";
 import { useUserStore } from "@/pinia/user";
-import {
-  type Game,
-  type GameStateType,
-  type PokerCardsType,
-  type TokenMovedEvent,
-  type UserPokerCard,
-  PokerCards
-} from "@/types";
+import { type Game, type GameStateType, type TokenMovedEvent, type UserPokerCard, PokerCards } from "@/types";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -77,7 +71,7 @@ socket.on("game session vote", ({ vote }: { vote: string }) => {
   activeCard.value = vote;
 });
 
-const selectCard = (card: PokerCardsType) => {
+const selectCard = (card: string) => {
   activeCard.value = card;
 };
 
@@ -125,6 +119,7 @@ socket.on("game voting", () => {
           :active="activeCard"
           @click="selectCard(card)"
         />
+        <PokerCardWritable :disabled="hasVoted" :active="activeCard" @select="selectCard($event)" />
       </div>
       <button class="button is-info vote-button" :disabled="!canVote" @click="vote()">Vote!</button>
     </section>
