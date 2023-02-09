@@ -53,7 +53,7 @@ const { activeGames, hostedGames } = useDashboard();
     <div v-for="(game, i) in hostedGames" :key="i" class="column is-3 is-2-fullhd">
       <div class="box">
         <p class="subtitle one-line-text">{{ game.title || `Game #${game.id}` }}</p>
-        <div>
+        <div v-if="false">
           <button class="button is-info">See rounds</button>
         </div>
       </div>
