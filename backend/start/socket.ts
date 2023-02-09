@@ -79,8 +79,6 @@ io.use(async (socket: AuthenticatableSocket, next) => {
     }
   }
 
-  // TODO: Check that the game actually exists
-  //       should also then check the join type if it is valid.
   const gamePin = socket.handshake.auth.gamePin
   if (!gamePin) {
     return next(new Error('No game pin'))
@@ -115,6 +113,15 @@ io.use(async (socket: AuthenticatableSocket, next) => {
     user = authenticatable
   } catch (error) {
     return next(new Error('Auth failed'))
+  }
+
+  const game = await Game.findBy('pin', gamePin)
+  if (!game) {
+    return next(new Error('Game not found'))
+  }
+
+  if (joinType === 'host' && game.userId !== user.id) {
+    return next(new Error('Unauthorized host user'))
   }
 
   // Create new session
@@ -380,7 +387,7 @@ io.on('connection', async (socket: AuthenticatableSocket) => {
     await GameVote.create({
       roundId: game.latestRound.id,
       userId: socket.user.id,
-      vote: value,
+      vote: value.slice(0, 12),
     })
 
     io.in(socket.gamePin).emit('game vote', {
