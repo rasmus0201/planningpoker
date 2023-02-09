@@ -111,7 +111,7 @@ socket.on("game voting", () => {
       </div>
     </aside>
 
-    <section v-if="gameState === 'lobby'" class="column is-relative is-12-mobile is-10">
+    <section v-if="gameState === 'lobby'" class="token-canvas-container column is-relative is-12-mobile is-10">
       <DraggableTokenCanvas :key="wsSession.color" :color="wsSession.color ?? '#000000'" @move="onMove($event)" />
     </section>
 
@@ -161,6 +161,12 @@ socket.on("game voting", () => {
   gap: 10px;
   padding: 10px;
   margin-bottom: 125px;
+}
+
+@media screen and (max-width: 768px) {
+  .token-canvas-container {
+    min-height: 100vh;
+  }
 }
 
 .vote-button {
