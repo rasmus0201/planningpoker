@@ -23,6 +23,7 @@
   - [x] Give spillet en titel (autoudfyld: planning d. xx/yy/zzzz)
   - [x] Host'en skal kunne se "aktive" forbindelser.
   - [x] "Oversigt" over folk der har smidt deres kort.
+  - [x] Custom Writable card
   - [x] Force reveal (force show)
   - [x] Resultat vises både på "lærred" og de enkelte users.
   - [x] Afslut spil manuelt
@@ -38,10 +39,10 @@
 - [x] Ability to send emails (on production)
 - [x] Production setup
 
-
 Things for later:
   - Theme: Light / Dark (by system pref)
-  - Custom Writable card
+  - En måde at styr hvilke users der skal have voted
+    - Kan være en "lock". Kan være mulighed for at kick'e personer. Kunne også på player have en "Exit game" some sletter session instantly. Kunne også filtrer yderligere i vote listeneren, efter om man er disconnected (eller threshold disconnected)
   - Vise enkelte runder og hvilke svar der var (tag/badge med DisplayName) når der trykket ind på et tidligere spil
   - Deltagede spil (tag/badge med dato + host + hvilken join type)
   - Host lobby-musik?
