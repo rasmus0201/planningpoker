@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Env_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Env"));
 const config_1 = require("@adonisjs/mail/build/config");
 exports.default = (0, config_1.mailConfig)({
-    mailer: Env_1.default.get('NODE_ENV') === 'production' ? 'mailgun' : 'smtp',
+    mailer: 'smtp',
     mailers: {
         smtp: {
             driver: 'smtp',
