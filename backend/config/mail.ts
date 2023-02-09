@@ -18,7 +18,7 @@ export default mailConfig({
   | a mailer
   |
   */
-  mailer: Env.get('NODE_ENV') === 'production' ? 'mailgun' : 'smtp',
+  mailer: 'smtp',
 
   /*
   |--------------------------------------------------------------------------
