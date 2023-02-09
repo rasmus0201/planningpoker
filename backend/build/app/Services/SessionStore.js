@@ -48,7 +48,7 @@ class InMemorySessionStore extends SessionStore {
             if (!session.disconnectedAt) {
                 return session;
             }
-            if (luxon_1.DateTime.now().minus({ seconds: 60 }).toMillis() <= session.disconnectedAt) {
+            if (luxon_1.DateTime.now().minus({ minutes: 120 }).toMillis() <= session.disconnectedAt) {
                 return session;
             }
             this.deleteSession(session.sessionId);

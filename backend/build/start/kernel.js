@@ -31,5 +31,6 @@ Server_1.default.middleware.register([() => Promise.resolve().then(() => __impor
 Server_1.default.middleware.registerNamed({
     guest: () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]('App/Middleware/Guest'))),
     auth: () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]('App/Middleware/Auth'))),
+    userActive: () => Promise.resolve().then(() => __importStar(global[Symbol.for('ioc.use')]('App/Middleware/UserActive'))),
 });
 //# sourceMappingURL=kernel.js.map

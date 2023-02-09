@@ -29,7 +29,7 @@ Route_1.default.group(() => {
         Route_1.default.post('/export', async (ctx) => new MeController_1.default().export(ctx));
     })
         .prefix('/me')
-        .middleware('auth');
+        .middleware(['auth', 'userActive']);
     Route_1.default.group(() => {
         Route_1.default.get('/', async (ctx) => new GamesController_1.default().index(ctx));
         Route_1.default.post('/', async (ctx) => new GamesController_1.default().create(ctx));
@@ -37,6 +37,6 @@ Route_1.default.group(() => {
         Route_1.default.delete('/:pin', async (ctx) => new GamesController_1.default().delete(ctx));
     })
         .prefix('/games')
-        .middleware('auth');
+        .middleware(['auth', 'userActive']);
 }).prefix('/api');
 //# sourceMappingURL=routes.js.map

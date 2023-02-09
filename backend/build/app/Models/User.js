@@ -16,6 +16,8 @@ const luxon_1 = require("luxon");
 const Hash_1 = __importDefault(global[Symbol.for('ioc.use')]("Adonis/Core/Hash"));
 const Orm_1 = global[Symbol.for('ioc.use')]("Adonis/Lucid/Orm");
 const Game_1 = __importDefault(require("./Game"));
+const GameVote_1 = __importDefault(require("./GameVote"));
+const ApiToken_1 = __importDefault(require("./ApiToken"));
 class User extends Orm_1.BaseModel {
     static async beforeSave(user) {
         if (user.$dirty.password && user.password !== '') {
@@ -63,9 +65,17 @@ __decorate([
     __metadata("design:type", Object)
 ], User.prototype, "deletedAt", void 0);
 __decorate([
+    (0, Orm_1.hasMany)(() => ApiToken_1.default),
+    __metadata("design:type", Object)
+], User.prototype, "apiTokens", void 0);
+__decorate([
     (0, Orm_1.hasMany)(() => Game_1.default),
     __metadata("design:type", Object)
 ], User.prototype, "games", void 0);
+__decorate([
+    (0, Orm_1.hasMany)(() => GameVote_1.default),
+    __metadata("design:type", Object)
+], User.prototype, "gameVotes", void 0);
 __decorate([
     (0, Orm_1.beforeSave)(),
     __metadata("design:type", Function),

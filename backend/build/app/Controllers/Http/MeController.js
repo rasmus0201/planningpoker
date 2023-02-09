@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Validator_1 = global[Symbol.for('ioc.use')]("Adonis/Core/Validator");
+const UserCleanUp_1 = __importDefault(global[Symbol.for('ioc.use')]("App/Services/UserCleanUp"));
 class MeController {
     async view({ response, auth }) {
         if (!auth.user) {
@@ -28,6 +32,9 @@ class MeController {
         });
         const data = await request.validate({ schema: validations });
         if (data.username) {
+            if (data.username.startsWith('DELETED@')) {
+                throw new Error('Username not allowed');
+            }
             auth.user.username = data.username;
         }
         if (data.email) {
@@ -45,10 +52,8 @@ class MeController {
         if (!auth.user) {
             return response.unauthorized();
         }
-        auth.user.username = `DELETED@${auth.user.id}`;
-        auth.user.email = `DELETED@${auth.user.id}`;
-        auth.user.password = '';
-        await auth.user.save();
+        const userCleanUpService = new UserCleanUp_1.default();
+        await userCleanUpService.run(auth.user);
         await auth.use('api').revoke();
         return response.json({ message: 'User deleted' });
     }
@@ -56,7 +61,9 @@ class MeController {
         if (!auth.user) {
             return response.unauthorized();
         }
-        return response.json({ message: 'Exported data' });
+        await auth.user.load('games');
+        await auth.user.load('gameVotes');
+        return response.json({ message: 'Exported data', export: auth.user.toJSON() });
     }
 }
 exports.default = MeController;

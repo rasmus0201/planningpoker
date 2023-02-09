@@ -19,6 +19,9 @@ class AuthController {
             username: Validator_1.schema.string({}, [Validator_1.rules.unique({ table: User_1.default.table, column: 'username' })]),
         });
         const data = await request.validate({ schema: validations });
+        if (data.username.startsWith('DELETED@')) {
+            throw new Error('Username not allowed');
+        }
         const user = await User_1.default.create(data);
         const token = await auth.use('api').generate(user);
         return response.created({ user, token });

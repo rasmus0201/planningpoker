@@ -62,7 +62,7 @@ io.use(async (socket, next) => {
         return next(new Error('No auth token'));
     }
     const joinType = socket.handshake.auth.joinType;
-    if (!token) {
+    if (!joinType) {
         return next(new Error('No join type'));
     }
     let user;
@@ -224,6 +224,14 @@ io.on('connection', async (socket) => {
         await game.save();
         sendGameRevealEvent(votes, socket, 'broadcast');
     });
+    socket.on('game forceContinue', async () => {
+        if (socket.joinType !== 'host') {
+            return;
+        }
+        const game = (await Game_1.default.findBy('pin', socket.gamePin));
+        game.state = 'voting';
+        await game.save();
+    });
     socket.on('game continue', async () => {
         if (socket.joinType !== 'host') {
             return;
@@ -291,7 +299,6 @@ io.on('connection', async (socket) => {
     socket.on('disconnect', async () => {
         const matchingSockets = await io.in(socket.userId).fetchSockets();
         if (matchingSockets.length === 0) {
-            socket.broadcast.to(socket.gamePin).emit('user disconnected', socket.userId);
             sessionStore.saveSession(socket.sessionId, {
                 sessionId: socket.sessionId,
                 userId: socket.userId,
@@ -303,6 +310,7 @@ io.on('connection', async (socket) => {
                 disconnectedAt: luxon_1.DateTime.now().toMillis(),
                 connected: false,
             });
+            socket.broadcast.to(socket.gamePin).emit('user disconnected', socket.userId);
         }
     });
 });

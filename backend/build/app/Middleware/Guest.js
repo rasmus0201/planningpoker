@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const standalone_1 = require("@adonisjs/auth/build/standalone");
-class AuthMiddleware {
+class GuestMiddleware {
     async handle({ auth }, next, customGuards) {
         const guards = customGuards.length ? customGuards : [auth.name];
         await this.authenticate(auth, guards);
@@ -16,5 +16,5 @@ class AuthMiddleware {
         return true;
     }
 }
-exports.default = AuthMiddleware;
+exports.default = GuestMiddleware;
 //# sourceMappingURL=Guest.js.map
