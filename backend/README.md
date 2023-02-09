@@ -23,4 +23,5 @@ Build with AdonisJS.
 3. `npm i`
 4. `node ace serve --watch`
 5. Optional run the scheduler using: `node ace scheduler`
-6. When done remember to commit production assets - `node ace build --production && cd build && npm ci --production`
+6. When done remember to commit production assets - `node ace build --production --ignore-ts-errors
+ && cd build && npm ci --production`
