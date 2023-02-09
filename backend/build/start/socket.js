@@ -78,6 +78,13 @@ io.use(async (socket, next) => {
     catch (error) {
         return next(new Error('Auth failed'));
     }
+    const game = await Game_1.default.findBy('pin', gamePin);
+    if (!game) {
+        return next(new Error('Game not found'));
+    }
+    if (joinType === 'host' && game.userId !== user.id) {
+        return next(new Error('Unauthorized host user'));
+    }
     socket.sessionId = randomId();
     socket.userId = randomId();
     socket.gamePin = gamePin;
@@ -275,7 +282,7 @@ io.on('connection', async (socket) => {
         await GameVote_1.default.create({
             roundId: game.latestRound.id,
             userId: socket.user.id,
-            vote: value,
+            vote: value.slice(0, 12),
         });
         io.in(socket.gamePin).emit('game vote', {
             userId: socket.userId,
