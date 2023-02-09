@@ -32,11 +32,11 @@
   - [x] Aktive spil med actions
   - [x] Oprettede spil (tag/badge med dato)
 - README
-  - Project
-  - Backend
-  - Frontend
-- Ability to send emails (on production)
-- Production setup
+  - [x] Project
+  - [x] Backend
+  - [x] Frontend
+- [x] Ability to send emails (on production)
+- [x] Production setup
 
 
 Things for later:
