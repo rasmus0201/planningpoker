@@ -14,7 +14,7 @@ Build with AdonisJS.
 3. Create the `.env` file with DB credentials and other config. `cp .env.example .env`
 4. `ENV_PATH={$FULL_PATH_TO_PLANNING_POKER}/backend/.env node ace migration:fresh`
 5. Edit `ecosystem.config.js` to correspond with the correct env path.
-6. `pm2 start && pm2 save`
+6. `pm2 start ecosystem.config.js --env production && pm2 save`
 7. `cd build && npm ci --production`
 8. Setup the nginx config for the site using the blueprint file `nginx-site.conf` in the root of the config. The site also needs a TLS-cert, so use certbot for this.
 
