@@ -13,7 +13,7 @@ module.exports = {
     },
     {
       name: 'planningpoker-schedule',
-      script: 'node ./ace schedule',
+      script: 'node ./build/ace schedule',
       autorestart: true,
       env: {
         ENV_PATH: '/Users/rso/http/planningpoker/backend/.env',
