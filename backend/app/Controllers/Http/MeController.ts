@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { rules, schema } from '@ioc:Adonis/Core/Validator'
 import UserCleanUp from 'App/Services/UserCleanUp'
-import { DateTime } from 'luxon'
 
 export default class MeController {
   public async view({ response, auth }: HttpContextContract) {
@@ -63,6 +62,10 @@ export default class MeController {
     }
 
     const userCleanUpService = new UserCleanUp()
+
+    // Load relations
+    await auth.user.load('games')
+    await auth.user.load('gameVotes')
 
     await userCleanUpService.run(auth.user)
     await auth.use('api').revoke()

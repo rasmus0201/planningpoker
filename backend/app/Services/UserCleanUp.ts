@@ -9,15 +9,20 @@ export default class UserCleanUp {
     user.deletedAt = DateTime.now()
 
     // Anonymize user votes
-    user.gameVotes.forEach((v) => {
-      v.vote = '[DELETED]'
-      v.save()
-    })
+    if (user.gameVotes?.length) {
+      user.gameVotes.forEach((v) => {
+        v.vote = '[DELETED]'
+        v.save()
+      })
+    }
 
-    user.games.forEach((g) => {
-      g.title = '[DELETED]'
-      g.save()
-    })
+    // Anonymize user games
+    if (user.games?.length) {
+      user.games.forEach((g) => {
+        g.title = '[DELETED]'
+        g.save()
+      })
+    }
 
     await user.related('apiTokens').query().delete()
     await user.save()
