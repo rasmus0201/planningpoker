@@ -85,7 +85,7 @@ socket.on("game voting", () => {
       <div class="p-4">
         <p class="menu-label">{{ game.title }}</p>
         <p class="menu-label">Joined Users:</p>
-        <JoinedUsers :users="users" />
+        <JoinedUsers :users="users" :game-state="game.state" />
         <button class="button is-small is-warning mt-5" @click="onDeleteSession()">Delete session</button>
       </div>
     </aside>

@@ -20,6 +20,7 @@ export function useGameUsers(socket: AuthenticatableSocket) {
   socket.on("users", (newUsers: WsUser[]) => {
     newUsers.forEach((user: WsUser) => {
       user.self = user.userId === socket.userId;
+      user.hasVoted = users.value.find((u) => u.userId === user.userId)?.hasVoted ?? false;
     });
 
     users.value = newUsers;

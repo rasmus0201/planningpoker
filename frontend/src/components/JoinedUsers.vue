@@ -1,17 +1,24 @@
 <script lang="ts" setup>
 import { mapJoinType } from "@/helpers";
-import { WsUser } from "@/types";
+import { GameStateType, WsUser } from "@/types";
 
-defineProps<{
+const props = defineProps<{
   users: WsUser[];
+  gameState: GameStateType;
 }>();
+
+const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameState === "voting";
 </script>
 
 <template>
   <div class="is-flex is-flex-direction-column">
     <div v-for="user in users.filter((u) => u.connected)" :key="`${user.userId}-${user.connected}`" class="active-user">
       <span class="active-user__dot" :class="user.self ? 'has-background-info' : 'has-background-success'"></span>
-      <span>{{ user.username }} ({{ mapJoinType(user.joinType) }})</span>
+      <span
+        ><span v-if="hasVotingState(user)">{{ user.hasVoted ? "🏆" : "💩" }}</span> {{ user.username }} ({{
+          mapJoinType(user.joinType)
+        }})</span
+      >
     </div>
   </div>
 </template>

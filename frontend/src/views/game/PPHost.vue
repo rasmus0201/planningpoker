@@ -119,7 +119,7 @@ socket.on("game voting", () => {
           <button v-if="canFinishGame" class="button is-danger mb-3" @click="onFinishGame()">Finish</button>
         </div>
         <p class="menu-label">Joined Users:</p>
-        <JoinedUsers :users="users" />
+        <JoinedUsers :users="users" :game-state="game.state" />
         <button class="button is-small is-warning mt-5" @click="onDeleteSession()">Delete session</button>
 
         <div ref="qrContainer" class="mt-5">
