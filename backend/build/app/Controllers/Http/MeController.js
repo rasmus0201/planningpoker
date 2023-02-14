@@ -53,6 +53,8 @@ class MeController {
             return response.unauthorized();
         }
         const userCleanUpService = new UserCleanUp_1.default();
+        await auth.user.load('games');
+        await auth.user.load('gameVotes');
         await userCleanUpService.run(auth.user);
         await auth.use('api').revoke();
         return response.json({ message: 'User deleted' });

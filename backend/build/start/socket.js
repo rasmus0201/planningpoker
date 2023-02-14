@@ -178,6 +178,10 @@ io.on('connection', async (socket) => {
             connected: true,
         });
     });
+    socket.on('delete session', () => {
+    });
+    socket.on('kick session', (userId) => {
+    });
     socket.on('users list', () => {
         const users = [];
         sessionStore.findAllSessions().forEach((session) => {
@@ -290,7 +294,9 @@ io.on('connection', async (socket) => {
         });
         const playerIds = sessionStore
             .findAllSessions()
-            .filter((s) => s.gamePin === game.pin && s.joinType === 'play')
+            .filter((s) => s.gamePin === game.pin &&
+            s.joinType === 'play' &&
+            (s.connected || s.disconnectedAt >= luxon_1.DateTime.now().minus({ seconds: 60 }).toMillis()))
             .map((s) => s.user.id);
         const votes = await GameVote_1.default.query().preload('user').where('round_id', game.latestRound.id);
         const votingUserIds = votes.flatMap((v) => v.userId);

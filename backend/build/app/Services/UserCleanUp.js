@@ -7,14 +7,18 @@ class UserCleanUp {
         user.email = `DELETED@${user.id}`;
         user.password = '';
         user.deletedAt = luxon_1.DateTime.now();
-        user.gameVotes.forEach((v) => {
-            v.vote = '[DELETED]';
-            v.save();
-        });
-        user.games.forEach((g) => {
-            g.title = '[DELETED]';
-            g.save();
-        });
+        if (user.gameVotes?.length) {
+            user.gameVotes.forEach((v) => {
+                v.vote = '[DELETED]';
+                v.save();
+            });
+        }
+        if (user.games?.length) {
+            user.games.forEach((g) => {
+                g.title = '[DELETED]';
+                g.save();
+            });
+        }
         await user.related('apiTokens').query().delete();
         await user.save();
     }
