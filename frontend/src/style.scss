@@ -1,0 +1,29 @@
+html, body {
+  min-height: 100vh;
+}
+
+html.dark,
+body.dark {
+  background-color: hsl(0deg, 0%, 10%);
+  color: hsl(0deg, 0%, 90%);
+}
+
+.dark {
+  a:hover {
+    color: hsl(0deg, 0%, 60%);
+  }
+
+  .box {
+    background-color: hsl(0deg, 0%, 20%);
+    color: hsl(0deg, 0%, 90%);
+  }
+
+  .input, .textarea {
+    background-color: hsl(0deg, 0%, 20%);
+    color: hsl(0deg, 0%, 90%);
+  }
+
+  .input::placeholder, .textarea::placeholder {
+    color: hsl(0deg, 0%, 60%);
+  }
+}
