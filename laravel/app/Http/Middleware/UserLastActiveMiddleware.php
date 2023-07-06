@@ -15,6 +15,13 @@ class UserLastActiveMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var \App\Models\User */
+        if ($user = $request->user()) {
+            $user->update([
+                'last_active_at' => now(),
+            ]);
+        }
+
         return $next($request);
     }
 }
