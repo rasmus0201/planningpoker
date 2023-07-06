@@ -6,8 +6,10 @@ declare module "*.vue" {
 
 export declare global {
   interface ImportMetaEnv {
-    readonly VITE_API_URL: string;
-    readonly VITE_WS_URL: string;
+    readonly VITE_API_BASE_URL: string;
+    readonly VITE_PUSHER_CLUSTER: string;
+    readonly VITE_PUSHER_KEY: string;
+    readonly VITE_PUSHER_AUTH_ENDPOINT: string;
   }
 
   interface ImportMeta {

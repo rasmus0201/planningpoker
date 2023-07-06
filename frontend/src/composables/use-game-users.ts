@@ -1,94 +1,65 @@
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { MaybeRef } from "@vueuse/core";
+import { PresenceChannel } from "laravel-echo";
+import { computed, ref, unref } from "vue";
 
-import { AuthenticatableSocket, WsUser } from "@/types";
+import { GameStateType, Participant, WsUser } from "@/types";
 
-export function useGameUsers(socket: AuthenticatableSocket) {
+export function useGameUsers(channel: PresenceChannel, currentUser: WsUser, votingUsers: MaybeRef<Participant[]>) {
   const users = ref<WsUser[]>([]);
-  const timer = ref<NodeJS.Timeout | null>(null);
 
-  const refreshUsers = () => {
-    socket.emit("users list");
-    timer.value = setTimeout(refreshUsers, 5000);
-  };
+  channel
+    .here((newUsers: WsUser[]) => {
+      newUsers.forEach((user: WsUser) => {
+        user.connected = true;
+        user.hasVoted = user.participantId
+          ? unref(votingUsers)
+              .map((p) => p.id)
+              .includes(user.participantId)
+          : false;
+        user.self = user.broadcastingId === currentUser.broadcastingId;
+      });
 
-  onMounted(() => {
-    timer.value = setTimeout(refreshUsers, 5000);
-  });
+      users.value = newUsers;
+    })
+    .joining((user: WsUser) => {
+      for (const existingUser of users.value) {
+        if (existingUser.broadcastingId === user.broadcastingId) {
+          existingUser.connected = true;
+          return;
+        }
+      }
 
-  onBeforeUnmount(() => timer.value && clearTimeout(timer.value));
-
-  socket.on("users", (newUsers: WsUser[]) => {
-    newUsers.forEach((user: WsUser) => {
-      user.self = user.userId === socket.userId;
-      user.hasVoted = users.value.find((u) => u.userId === user.userId)?.hasVoted ?? false;
+      users.value.push(user);
+    })
+    .leaving((user: WsUser) => {
+      for (const existingUser of users.value) {
+        if (existingUser.broadcastingId === user.broadcastingId) {
+          existingUser.connected = false;
+          return;
+        }
+      }
+    })
+    .error((error: string) => {
+      console.error(error);
     });
 
-    users.value = newUsers;
-  });
-
-  socket.on("user connected", (user: WsUser) => {
-    for (const existingUser of users.value) {
-      if (existingUser.userId === user.userId) {
-        existingUser.connected = true;
-        return;
-      }
-    }
-
-    users.value.push(user);
-  });
-
-  socket.on("user disconnected", (userId: string) => {
+  channel.listen(".game.vote", ({ participant }: { participant: Participant }) => {
     for (const user of users.value) {
-      if (user.userId === userId) {
-        user.connected = false;
-        return;
-      }
-    }
-  });
-
-  socket.on("connect", () => {
-    for (const user of users.value) {
-      if (user.self) {
-        user.connected = true;
-        return;
-      }
-    }
-  });
-
-  socket.on("disconnect", () => {
-    for (const user of users.value) {
-      if (user.self) {
-        user.connected = false;
-        return;
-      }
-    }
-  });
-
-  socket.on("game vote", ({ userId }: { userId: string }) => {
-    for (const user of users.value) {
-      if (user.userId === userId) {
+      if (user.participantId === participant.id) {
         user.hasVoted = true;
       }
     }
   });
 
-  socket.on("game reveal", () => {
-    for (const user of users.value) {
-      user.hasVoted = false;
+  channel.listen(".game.state", ({ state }: { state: GameStateType }) => {
+    if (state === "revealing" || state === "voting") {
+      for (const user of users.value) {
+        user.hasVoted = false;
+      }
     }
   });
 
-  onBeforeUnmount(() => {
-    socket.off("connect");
-    socket.off("disconnect");
-    socket.off("users");
-    socket.off("user connected");
-    socket.off("user disconnected");
-    socket.off("game vote");
-    socket.off("game reveal");
-  });
-
-  const sortedUsers = computed(() => users.value.sort((a, b) => a.userId.localeCompare(b.userId)));
+  const sortedUsers = computed(() => [...users.value].sort((a, b) => String(a.userId).localeCompare(String(b.userId))));
 
   return {
     users: sortedUsers

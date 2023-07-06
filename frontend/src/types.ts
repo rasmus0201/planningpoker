@@ -1,5 +1,3 @@
-import { type Socket } from "socket.io-client";
-
 export const PokerCards = [
   "1",
   "2",
@@ -21,43 +19,31 @@ export type PokerCardsType = (typeof PokerCards)[number];
 
 export type JoinType = "host" | "play" | "spectate";
 
-export type GameStateType = "lobby" | "voting" | "reveal" | "finished";
+export type GameStateType = "lobby" | "voting" | "revealing" | "finished";
 
 export interface Game {
   id: number;
-  user_id: number;
+  userId: number;
   title: string;
   pin: string;
   state: GameStateType;
 }
 
-export interface TokenMovedEvent {
-  x: number;
-  y: number;
-  containerWidth: number;
-  containerHeight: number;
-}
-
 export interface WsUser {
-  userId: string;
+  socketId: string;
+  broadcastingId: string;
+  userId: number;
+  participantId: number | null;
   username: string;
   hasVoted: boolean;
   joinType?: JoinType;
   connected?: boolean;
-  color?: string;
   self?: boolean;
 }
 
-export interface WsSession {
-  sessionId: string;
-  userId: string;
-  gamePin: string;
-  color: string;
-  user: WsUser;
-}
-
-export interface AuthenticatableSocket extends Socket {
-  userId?: string;
+export interface Participant {
+  id: number;
+  username: string;
 }
 
 export interface UserPokerCard {

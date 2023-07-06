@@ -8,10 +8,13 @@ import { API_URL } from "@/config";
 const router = useRouter();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
+const error = ref("");
 const email = ref("");
 
 const onSubmit = async () => {
+  error.value = "";
   state.value = "loading";
+
   try {
     const response = await fetch(`${API_URL}/auth/forgot-password`, {
       method: "POST",
@@ -19,12 +22,15 @@ const onSubmit = async () => {
       body: JSON.stringify({ email: email.value, returnPath: router.resolve({ name: "auth.resetPassword" }).path })
     });
 
+    const body = await response.json();
+
     if (!response.ok) {
+      error.value = body.message ?? "Please try again";
       throw new Error();
     }
 
     state.value = "success";
-  } catch (error) {
+  } catch (e) {
     state.value = "error";
   }
 };
@@ -36,8 +42,8 @@ const onSubmit = async () => {
       <div class="has-text-centered">We have send you an email with a confirmation link.</div>
     </div>
     <div v-else class="columns w-100 is-flex is-flex-direction-column box">
-      <div v-if="state === 'error'" class="colum">
-        <p class="has-text-danger">Please try again.</p>
+      <div v-if="state === 'error'" class="column">
+        <p class="has-text-danger">{{ error }}</p>
       </div>
       <div class="column">
         <label for="email">Email</label>

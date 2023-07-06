@@ -20,7 +20,7 @@ const onAccountUpdate = async () => {
   try {
     const response = await fetch(`${API_URL}/me`, {
       method: "PATCH",
-      headers: new Headers({ "Content-Type": "application/json", Authorization: userStore.authHeader }),
+      headers: new Headers({ "Content-Type": "application/json" }),
       body: JSON.stringify(form)
     });
 
@@ -29,7 +29,7 @@ const onAccountUpdate = async () => {
     }
 
     const json = await response.json();
-    userStore.user = json.user;
+    userStore.user = json.data;
 
     form.password = "";
 
@@ -44,8 +44,7 @@ const onExport = async () => {
   state.value = "loading";
   try {
     const response = await fetch(`${API_URL}/me/export`, {
-      method: "POST",
-      headers: new Headers({ Authorization: userStore.authHeader })
+      method: "POST"
     });
 
     if (!response.ok) {
@@ -54,7 +53,7 @@ const onExport = async () => {
 
     const json = await response.json();
 
-    exportedData.value = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json.export, null, 2));
+    exportedData.value = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json.data, null, 2));
 
     state.value = "success";
   } catch (error) {
@@ -71,8 +70,7 @@ const onErasure = async () => {
   state.value = "loading";
   try {
     const response = await fetch(`${API_URL}/me`, {
-      method: "DELETE",
-      headers: new Headers({ Authorization: userStore.authHeader })
+      method: "DELETE"
     });
 
     if (!response.ok) {

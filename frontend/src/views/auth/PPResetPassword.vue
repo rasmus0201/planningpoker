@@ -33,7 +33,7 @@ const onSubmit = async () => {
     router.push({ name: "auth.login" });
 
     state.value = "success";
-  } catch (error) {
+  } catch (e) {
     state.value = "error";
   }
 };
@@ -43,7 +43,7 @@ const onSubmit = async () => {
   <AuthFormWrapper :disabled="state === 'loading'" @submit="onSubmit()">
     <div class="columns w-100 is-flex is-flex-direction-column box">
       <div v-if="state === 'error'" class="column">
-        <p class="has-text-danger">Please try again.</p>
+        <p class="has-text-danger">Error...</p>
       </div>
       <div class="column">
         <label for="email">Confirm Email</label>

@@ -10,6 +10,12 @@ const { activeGames, hostedGames } = useDashboard();
 </script>
 
 <template>
+  <div v-if="!activeGames.length && !hostedGames.length" class="columns mt-5">
+    <div class="column is-12">
+      <h1 class="title">No games</h1>
+    </div>
+  </div>
+
   <div v-if="activeGames.length" class="columns mt-5 is-multiline">
     <div class="column is-12">
       <h1 class="title">Active Games:</h1>
@@ -20,22 +26,16 @@ const { activeGames, hostedGames } = useDashboard();
         <p class="mb-2">Pin: {{ game.pin }}</p>
         <div class="buttons-container">
           <RouterLink
-            v-if="game.user_id === userStore.user.id"
-            :to="{ name: 'game.host', query: { fresh: 'true' }, params: { pin: game.pin } }"
+            v-if="game.userId === userStore.user.id"
+            :to="{ name: 'game.host', params: { pin: game.pin } }"
             class="button is-info"
           >
             <span>Host</span>
           </RouterLink>
-          <RouterLink
-            :to="{ name: 'game.play', query: { fresh: 'true' }, params: { pin: game.pin } }"
-            class="button is-info"
-          >
+          <RouterLink :to="{ name: 'game.play', params: { pin: game.pin } }" class="button is-info">
             <span>Play</span>
           </RouterLink>
-          <RouterLink
-            :to="{ name: 'game.spectate', query: { fresh: 'true' }, params: { pin: game.pin } }"
-            class="button is-info"
-          >
+          <RouterLink :to="{ name: 'game.spectate', params: { pin: game.pin } }" class="button is-info">
             <span>Spectate</span>
           </RouterLink>
         </div>

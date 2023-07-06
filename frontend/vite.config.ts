@@ -1,5 +1,6 @@
 import vue from "@vitejs/plugin-vue";
 import { readFileSync } from "fs";
+import os from "os";
 import { resolve } from "path";
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
@@ -26,14 +27,16 @@ export default defineConfig(({ command }) => {
         cert: ""
       },
       proxy: {
-        "/api/*": {
-          target: "http://127.0.0.1:3333/",
-          changeOrigin: true
+        "/api": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+          secure: false,
+          ws: true
         }
       }
     };
 
-    const sslDir = resolve("~", ".ssl");
+    const sslDir = resolve(os.homedir(), ".ssl");
     const sslKeyPath = resolve(sslDir, `${devServerConfig.host}-key.pem`);
     const sslCertPath = resolve(sslDir, `${devServerConfig.host}.pem`);
 

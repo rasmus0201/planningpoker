@@ -3,10 +3,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { API_URL } from "@/config";
-import { useUserStore } from "@/pinia/user";
 
 const router = useRouter();
-const userStore = useUserStore();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 
@@ -22,7 +20,7 @@ const onCreate = async () => {
   try {
     const response = await fetch(`${API_URL}/games`, {
       method: "POST",
-      headers: new Headers({ "Content-Type": "application/json", Authorization: userStore.authHeader }),
+      headers: new Headers({ "Content-Type": "application/json" }),
       body: JSON.stringify({ title: title.value })
     });
 
@@ -32,7 +30,7 @@ const onCreate = async () => {
 
     const json = await response.json();
 
-    router.push({ name: "game.host", params: { pin: json.game.pin }, query: { fresh: "true" } });
+    router.push({ name: "game.host", params: { pin: json.data.pin } });
 
     state.value = "success";
   } catch (error) {

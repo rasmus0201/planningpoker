@@ -62,11 +62,11 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const userStore = useUserStore();
-  if (userStore.token && to.name?.toString().startsWith("auth.")) {
+  if (userStore.isLoggedIn && to.name?.toString().startsWith("auth.")) {
     return next({ name: "home" });
   }
 
-  if (!userStore.token && !to.name?.toString().startsWith("auth.")) {
+  if (!userStore.isLoggedIn && !to.name?.toString().startsWith("auth.")) {
     return next({ name: "auth.login" });
   }
 

@@ -3,12 +3,10 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { API_URL } from "@/config";
-import { useUserStore } from "@/pinia/user";
 import type { Game } from "@/types";
 
 const router = useRouter();
 const route = useRoute();
-const userStore = useUserStore();
 
 const pin = ref("");
 const joinType = ref<"play" | "spectate">("play");
@@ -44,7 +42,7 @@ const onSubmit = async () => {
   try {
     const response = await fetch(`${API_URL}/games/${pin.value}`, {
       method: "GET",
-      headers: new Headers({ "Content-Type": "application/json", Authorization: userStore.authHeader })
+      headers: new Headers({ "Content-Type": "application/json" })
     });
 
     if (!response.ok) {
@@ -52,13 +50,13 @@ const onSubmit = async () => {
     }
 
     const json = await response.json();
-    const game = json.game as Game;
+    const game = json.data.game as Game;
 
     if (!game.pin || game.state === "finished") {
       throw new Error();
     }
 
-    router.push({ name: `game.${joinType.value}`, params: { pin: pin.value }, query: { fresh: "true" } });
+    router.push({ name: `game.${joinType.value}`, params: { pin: pin.value } });
 
     state.value = "success";
   } catch (error) {

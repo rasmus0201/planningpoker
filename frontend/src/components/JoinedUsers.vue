@@ -12,8 +12,15 @@ const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameS
 
 <template>
   <div class="is-flex is-flex-direction-column">
-    <div v-for="user in users.filter((u) => u.connected)" :key="`${user.userId}-${user.connected}`" class="active-user">
-      <span class="active-user__dot" :class="user.self ? 'has-background-info' : 'has-background-success'"></span>
+    <div v-for="user in users" :key="user.socketId" class="active-user">
+      <span
+        class="active-user__dot"
+        :class="{
+          'has-background-info': user.self,
+          'has-background-success': user.connected,
+          'has-background-grey': !user.connected
+        }"
+      ></span>
       <span
         ><span v-if="hasVotingState(user)">{{ user.hasVoted ? "🏆" : "💩" }}</span> {{ user.username }} ({{
           mapJoinType(user.joinType)
@@ -39,6 +46,8 @@ const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameS
     margin-top: 3px;
     width: 0.5em;
     height: 0.5em;
+    min-width: 0.5em;
+    min-height: 0.5em;
     line-height: 1em;
     border-radius: 50%;
   }

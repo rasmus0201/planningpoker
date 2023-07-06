@@ -13,13 +13,14 @@ export function useDashboard() {
   onMounted(async () => {
     const response = await fetch(`${API_URL}/games`, {
       method: "GET",
-      headers: new Headers({ "Content-Type": "application/json", Authorization: userStore.authHeader })
+      headers: new Headers({ Accept: "application/json" })
     });
 
-    const json = await response.json();
-
-    activeGames.value = json.games.filter((g: Game) => g.state !== "finished");
-    hostedGames.value = json.games.filter((g: Game) => g.state === "finished" && g.user_id === userStore.user.id);
+    if (response.ok) {
+      const json = await response.json();
+      activeGames.value = json.data.filter((g: Game) => g.state !== "finished");
+      hostedGames.value = json.data.filter((g: Game) => g.state === "finished" && g.userId === userStore.user.id);
+    }
   });
 
   return {

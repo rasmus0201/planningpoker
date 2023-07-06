@@ -21,14 +21,17 @@
     "@vueuse/core": "^9.11.1",
     "bulma": "^0.9.4",
     "color": "^4.2.3",
+    "laravel-echo": "^1.15.1",
+    "lodash-es": "^4.17.21",
     "pinia": "^2.0.29",
     "pinia-plugin-persistedstate": "^3.0.2",
-    "socket.io-client": "^4.5.4",
+    "pusher-js": "^8.2.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
+    "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.11.18",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/eslint-config-prettier": "^7.0.0",

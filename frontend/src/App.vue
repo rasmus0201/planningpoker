@@ -32,13 +32,17 @@ watch(
     <template v-if="route.meta.gameLayout">
       <TheHeader :hide-by-default="true" />
       <main>
-        <RouterView></RouterView>
+        <Suspense>
+          <RouterView></RouterView>
+        </Suspense>
       </main>
     </template>
     <template v-else>
-      <TheHeader v-if="userStore.token" />
+      <TheHeader v-if="userStore.isLoggedIn" :hide-by-default="false" />
       <main class="container is-fluid is-relative">
-        <RouterView></RouterView>
+        <Suspense>
+          <RouterView></RouterView>
+        </Suspense>
       </main>
       <TheFooter />
     </template>

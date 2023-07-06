@@ -1,10 +1,13 @@
 import { computed, Ref } from "vue";
 
-import type { AuthenticatableSocket, Game } from "@/types";
+import type { Game } from "@/types";
 
-export function useGameActions(game: Ref<Game | undefined>, socket: AuthenticatableSocket) {
+import { useApi } from "./use-api";
+
+export function useGameActions(game: Ref<Game | undefined>) {
+  const api = useApi();
   const canStartGame = computed(() => game.value?.state === "lobby");
-  const canContinueGame = computed(() => game.value?.state === "voting" || game.value?.state === "reveal");
+  const canContinueGame = computed(() => game.value?.state === "voting" || game.value?.state === "revealing");
   const canForceReveal = computed(() => game.value?.state === "voting");
   const canFinishGame = computed(() => game.value?.state !== "finished");
 
@@ -13,19 +16,19 @@ export function useGameActions(game: Ref<Game | undefined>, socket: Authenticata
   );
 
   const onStartGame = () => {
-    socket.emit("game start");
-  };
-
-  const onForceReveal = () => {
-    socket.emit("game forceReveal");
-  };
-
-  const onContinueGame = () => {
-    socket.emit("game continue");
+    api.patch(`/games/${game.value?.pin}`, { state: "voting" });
   };
 
   const onFinishGame = () => {
-    socket.emit("game finish");
+    api.patch(`/games/${game.value?.pin}`, { state: "finished" });
+  };
+
+  const onForceReveal = () => {
+    api.patch(`/games/${game.value?.pin}`, { state: "revealing" });
+  };
+
+  const onContinueGame = () => {
+    api.patch(`/games/${game.value?.pin}`, { state: "voting" });
   };
 
   return {
