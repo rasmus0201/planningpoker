@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\ApiResponse;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class MeController extends Controller
 {
@@ -27,10 +28,16 @@ class MeController extends Controller
         /** @var \App\Models\User */
         $user = auth()->user();
 
-        $user->update([
+        $updates = [
             'email' => $request->email,
             'username' => $request->username,
-        ]);
+        ];
+
+        if ($request->password) {
+            $updates['password'] = Hash::make($request->password);
+        }
+
+        $user->update($updates);
 
         return ApiResponse::success($user);
     }

@@ -96,6 +96,9 @@ const onErasure = async () => {
             <div v-if="state === 'error'" class="field">
               <p class="has-text-danger">Please try again.</p>
             </div>
+            <div v-if="state === 'success'" class="field">
+              <p class="has-text-success">Changed made successfully.</p>
+            </div>
             <div class="field">
               <label class="label">Email</label>
               <div class="control">
@@ -146,5 +149,3 @@ const onErasure = async () => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped></style>

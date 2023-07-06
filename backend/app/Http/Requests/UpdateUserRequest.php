@@ -27,8 +27,13 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}\p{M}\p{N}._-]+$/', // Allow letters (included accented chars), numbers and special chars: ._-
                 Rule::unique('users', 'username')->ignoreModel(Auth::user()),
+            ],
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'max:255',
             ],
         ];
     }

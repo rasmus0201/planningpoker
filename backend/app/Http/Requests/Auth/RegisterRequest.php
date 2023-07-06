@@ -25,7 +25,6 @@ class RegisterRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}\p{M}\p{N}._-]+$/', // Allow letters (included accented chars), numbers and special chars: ._-
                 'unique:users,username',
             ],
             'password' => [
