@@ -1,50 +1,5 @@
-- Auth:
-  - [x] Registering + Login + Forgot password
-  - [x] Hash passwords
-  - [x] DisplayName + Email + Password
-- GDPR & Legal stuff:
-  - [x] Privatlivspolitik
-  - [x] Cookiepolitik
-  - [x] Slet bruger
-  - [x] Slet brugerdata
-  - [x] Forespørg brugerdata
-  - [x] Slet inaktive brugere efter 3 mdr.
-  - [x] Licensing (kort designs, musik)
-- Poker Cards
-  - [x] Red Booth Fibonacci Poker Cards
-- The Game:
-  - Mulighed for at hoste nyt spil
-    - [x] Mulighed for selv at joine??
-  - Mulighed for at joine spil via 6 cifret kode
-    - [x] Vises på "lærred"
-    - [x] Join som player eller spectator
-    - [x] Qr-code
-  - [x] "BioSpil lærred", hvor spillere kan rykke sin avatar inden spillet starter
-  - [x] Give spillet en titel (autoudfyld: planning d. xx/yy/zzzz)
-  - [x] Host'en skal kunne se "aktive" forbindelser.
-  - [x] "Oversigt" over folk der har smidt deres kort.
-  - [x] Custom Writable card
-  - [x] Force reveal (force show)
-  - [x] Resultat vises både på "lærred" og de enkelte users.
-  - [x] Afslut spil manuelt
-  - [x] Automatisk afslut spil efter 12 timer
-  - [x] Force next round (viser ikke mellemværende votes)
-- User oversigt:
-  - [x] Aktive spil med actions
-  - [x] Oprettede spil (tag/badge med dato)
-- README
-  - [x] Project
-  - [x] Backend
-  - [x] Frontend
-- [x] Ability to send emails (on production)
-- [x] Production setup
-
-Things for later:
-  - Theme: Light / Dark (by system pref)
-  - En måde at styr hvilke users der skal have voted
-    - Kan være en "lock". Kan være mulighed for at kick'e personer. Kunne også på player have en "Exit game" some sletter session instantly. Kunne også filtrer yderligere i vote listeneren, efter om man er disconnected (eller threshold disconnected)
-  - Vise enkelte runder og hvilke svar der var (tag/badge med DisplayName) når der trykket ind på et tidligere spil
-  - Deltagede spil (tag/badge med dato + host + hvilken join type)
-  - Host lobby-musik?
-  - Se "biospil"-tokens på egen skærm
-  - Label felt på runden? (navngivning af ticket, link til story, etc.)
+- Theme: Light / Dark (by system pref)
+- Vise enkelte runder og hvilke svar der var (tag/badge med DisplayName) når der trykket ind på et tidligere spil
+- Deltagede spil (tag/badge med dato + host + hvilken join type)
+- Host lobby-musik?
+- Label felt på runden? (navngivning af ticket, link til story, etc.)

@@ -1,5 +1,5 @@
 # Planning Poker
-This project is made with a Vue3 frontend and a NodeJS Adonis backend with Socket.io.
+This project is made with a Vue3 frontend and a PHP Laravel backend with Pusher.com.
 
 For setup & installation:
 - See [backend readme](/backend/)
@@ -10,7 +10,6 @@ For setup & installation:
 - Authentication: Sign Up, Sign In, Forgot Password
 - User can host a game
 - User can join games as a player or spectator (host can even join his own games)
-- Fun lobby token to move on screen
 - QR-code to scan join URL
 - Host can start and finish game. Host can also force reveal cards or continue to the next round.
 - Player can choose between Poker Cards.
