@@ -46,4 +46,5 @@ Things for later:
   - Vise enkelte runder og hvilke svar der var (tag/badge med DisplayName) når der trykket ind på et tidligere spil
   - Deltagede spil (tag/badge med dato + host + hvilken join type)
   - Host lobby-musik?
+  - Se "biospil"-tokens på egen skærm
   - Label felt på runden? (navngivning af ticket, link til story, etc.)
