@@ -19,11 +19,14 @@ Broadcast::channel('games.{pin}', function ($user, $pin) {
     if (Auth::check()) {
         $game = Game::where('pin', $pin)->first();
 
+        $participant = $user->participant($game);
+
         return [
             'socketId' => request('socket_id'),
             'broadcastingId' => $user->getAuthIdentifierForBroadcasting(),
             'userId' => $user->id,
-            'participantId' => $user->participant($game)?->id,
+            'participantId' => $participant?->id,
+            'kickedAt' => $participant?->kicked_at,
             'username' => $user->username,
             'joinType' => request('join_type'),
         ];
@@ -51,6 +54,6 @@ Route::middleware(['auth:sanctum', UserLastActiveMiddleware::class])->group(func
 
     Route::apiResource('games', GameController::class);
 
-    Route::apiResource('games.participants', GameParticipantController::class)->only(['index', 'store', 'destroy']);
+    Route::apiResource('games.participants', GameParticipantController::class)->only(['index', 'store', 'update']);
     Route::apiResource('games.votes', GameVoteController::class)->only(['store']);
 });

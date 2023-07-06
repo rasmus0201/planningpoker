@@ -22,7 +22,9 @@ class GameParticipantResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'userId' => $this->whenLoaded('user', fn () => $this->user->id),
             'username' => $this->whenLoaded('user', fn () => $this->user->username, ''),
+            'kickedAt' => $this->kicked_at,
         ];
     }
 }

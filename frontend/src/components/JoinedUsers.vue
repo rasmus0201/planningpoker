@@ -4,7 +4,13 @@ import { GameStateType, WsUser } from "@/types";
 
 const props = defineProps<{
   users: WsUser[];
+  canKick: boolean;
   gameState: GameStateType;
+}>();
+
+const emit = defineEmits<{
+  (e: "kick", user: WsUser): void;
+  (e: "unkick", user: WsUser): void;
 }>();
 
 const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameState === "voting";
@@ -12,7 +18,7 @@ const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameS
 
 <template>
   <div class="is-flex is-flex-direction-column">
-    <div v-for="user in users" :key="user.socketId" class="active-user">
+    <div v-for="(user, index) in users" :key="index" class="active-user">
       <span
         class="active-user__dot"
         :class="{
@@ -21,11 +27,16 @@ const hasVotingState = (user: WsUser) => user.joinType === "play" && props.gameS
           'has-background-grey': !user.connected
         }"
       ></span>
-      <span
-        ><span v-if="hasVotingState(user)">{{ user.hasVoted ? "🏆" : "💩" }}</span> {{ user.username }} ({{
+      <span>
+        <span v-if="hasVotingState(user)">{{ user.hasVoted ? "🏆" : "💩" }}</span> {{ user.username }} ({{
           mapJoinType(user.joinType)
-        }})</span
-      >
+        }})
+      </span>
+
+      <span v-if="user.joinType === 'play' && canKick">
+        <button v-if="user.kickedAt === null" class="button is-small is-light" @click="emit('kick', user)">Kick</button>
+        <button v-else class="button is-small is-light" @click="emit('unkick', user)">Unkick</button>
+      </span>
     </div>
   </div>
 </template>

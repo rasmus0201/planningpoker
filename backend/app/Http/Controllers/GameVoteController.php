@@ -25,6 +25,10 @@ class GameVoteController extends Controller
             throw new BadRequestHttpException();
         }
 
+        if ($participant->kicked_at) {
+            throw new BadRequestHttpException();
+        }
+
         $hasExistingVote = GameVote::where('game_round_id', $game->latestRound->id)
             ->where('game_participant_id', $participant->id)
             ->exists();
@@ -49,7 +53,7 @@ class GameVoteController extends Controller
         broadcast(new GameVoteCreated(new GameParticipantResource($participant), $game));
 
         // Check if all participants voted - if so broadcast reveal event and update game state.
-        $votesDiff = $game->participants()
+        $votesDiff = $game->participants()->whereNull('kicked_at')
             ->pluck('id')
             ->diff($game->latestRound->votes()->pluck('game_participant_id'));
 

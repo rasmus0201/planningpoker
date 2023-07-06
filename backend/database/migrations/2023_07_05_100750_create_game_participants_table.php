@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Game::class)->constrained()->cascadeOnDelete();
+            $table->timestamp('kicked_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->unique(['user_id', 'game_id']);
         });

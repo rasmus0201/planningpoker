@@ -1,25 +1,50 @@
 import { MaybeRef } from "@vueuse/core";
 import { PresenceChannel } from "laravel-echo";
+import { orderBy } from "lodash-es";
 import { computed, ref, unref } from "vue";
 
 import { GameStateType, Participant, WsUser } from "@/types";
 
-export function useGameUsers(channel: PresenceChannel, currentUser: WsUser, votingUsers: MaybeRef<Participant[]>) {
-  const users = ref<WsUser[]>([]);
+export function useGameUsers(
+  channel: PresenceChannel,
+  currentUser: WsUser,
+  participants: MaybeRef<Participant[]>,
+  votingUsers: MaybeRef<Participant[]>
+) {
+  const users = ref<WsUser[]>(
+    unref(participants).map((p) => ({
+      socketId: null,
+      broadcastingId: `${p.userId}.play`,
+      userId: p.userId,
+      participantId: p.id,
+      username: p.username,
+      kickedAt: p.kickedAt,
+      joinType: "play", // Participants can only be players.
+      hasVoted: false,
+      connected: false
+    }))
+  );
 
   channel
     .here((newUsers: WsUser[]) => {
-      newUsers.forEach((user: WsUser) => {
-        user.connected = true;
-        user.hasVoted = user.participantId
-          ? unref(votingUsers)
-              .map((p) => p.id)
-              .includes(user.participantId)
-          : false;
-        user.self = user.broadcastingId === currentUser.broadcastingId;
-      });
+      for (const newUser of newUsers) {
+        const newUserWithFields = {
+          ...newUser,
 
-      users.value = newUsers;
+          connected: true,
+          hasVoted: unref(votingUsers)
+            .map((p) => p.id)
+            .includes(newUser.participantId ?? -1),
+          self: newUser.broadcastingId === currentUser.broadcastingId
+        };
+
+        const existingIndex = users.value.findIndex((u) => u.broadcastingId === newUser.broadcastingId);
+        if (existingIndex >= 0) {
+          users.value[existingIndex] = newUserWithFields;
+        } else {
+          users.value.push(newUserWithFields);
+        }
+      }
     })
     .joining((user: WsUser) => {
       for (const existingUser of users.value) {
@@ -59,7 +84,7 @@ export function useGameUsers(channel: PresenceChannel, currentUser: WsUser, voti
     }
   });
 
-  const sortedUsers = computed(() => [...users.value].sort((a, b) => String(a.userId).localeCompare(String(b.userId))));
+  const sortedUsers = computed(() => orderBy([...users.value], ["connected", "id"], ["desc", "desc"]));
 
   return {
     users: sortedUsers

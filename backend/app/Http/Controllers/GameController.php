@@ -52,6 +52,9 @@ class GameController extends Controller
         $data = [
             'game' => new GameResource($game),
             'fact' => $game->state === GameState::Lobby ? $rf->get() : '',
+            'participants' => GameParticipantResource::collection(
+                $game->participants()->with('user')->get()
+            )->toArray($request),
             'votingUsers' => [],
             'votes' => [],
         ];

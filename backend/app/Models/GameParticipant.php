@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 
 class GameParticipant extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'user_id',
         'game_id',
+        'kicked_at',
+    ];
+
+    protected $casts = [
+        'kicked_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

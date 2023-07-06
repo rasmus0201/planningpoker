@@ -6,9 +6,11 @@ import { RouterLink } from "vue-router";
 import JoinedUsers from "@/components/JoinedUsers.vue";
 import PokerCard from "@/components/PokerCard.vue";
 import PokerCardBack from "@/components/PokerCardBack.vue";
-import { useGame, useGameActions } from "@/composables";
+import { useApi, useGame, useGameActions } from "@/composables";
+import { WsUser } from "@/types";
 
-const { game, gameState, gameJoinUrl, users, votingUsers, revealedCards } = await useGame("host");
+const { game, gameState, gameJoinUrl, users, votingUsers, revealedCards, ws } = await useGame("host");
+const api = useApi(ws);
 
 const {
   canStartGame,
@@ -23,6 +25,24 @@ const {
 } = useGameActions(game);
 
 const qrContainer = ref<HTMLElement | undefined>();
+
+const onKick = async (user: WsUser) => {
+  try {
+    await api.patch(`/games/${game.value?.pin}/participants/${user.participantId}`, { isKicked: true });
+    user.kickedAt = new Date().toUTCString();
+  } catch (error) {
+    // Noop
+  }
+};
+
+const onUnkick = async (user: WsUser) => {
+  try {
+    await api.patch(`/games/${game.value?.pin}/participants/${user.participantId}`, { isKicked: false });
+    user.kickedAt = null;
+  } catch (error) {
+    // Noop
+  }
+};
 </script>
 
 <template>
@@ -39,7 +59,13 @@ const qrContainer = ref<HTMLElement | undefined>();
           <button v-if="canFinishGame" class="button is-danger mb-3" @click="onFinishGame()">Finish</button>
         </div>
         <p class="menu-label">Joined Users:</p>
-        <JoinedUsers :users="users" :game-state="game.state" />
+        <JoinedUsers
+          :users="users"
+          :game-state="game.state"
+          :can-kick="true"
+          @kick="onKick($event)"
+          @unkick="onUnkick($event)"
+        />
 
         <div ref="qrContainer" class="mt-5">
           <QrCode

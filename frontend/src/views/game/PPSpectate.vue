@@ -15,7 +15,7 @@ const { fact, game, gameState, revealedCards, votingUsers, users } = await useGa
       <div class="p-4">
         <p class="menu-label">{{ game.title }}</p>
         <p class="menu-label">Joined Users:</p>
-        <JoinedUsers :users="users" :game-state="game.state" />
+        <JoinedUsers :users="users" :game-state="game.state" :can-kick="false" />
       </div>
     </aside>
 

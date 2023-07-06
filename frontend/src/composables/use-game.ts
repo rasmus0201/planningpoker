@@ -1,4 +1,3 @@
-import { promiseTimeout } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -18,9 +17,10 @@ export async function useGame(joinType: JoinType) {
   const { ws } = useWs(joinType);
 
   const currentUser: WsUser = {
-    socketId: "",
+    socketId: null,
     broadcastingId: `${userStore.user.id}.${joinType}`,
     userId: userStore.user.id,
+    kickedAt: null,
     joinType,
     participantId: null,
     username: userStore.user.username,
@@ -42,6 +42,7 @@ export async function useGame(joinType: JoinType) {
       ).href
   );
 
+  const gameParticipants = ref<Participant[]>([]);
   const votingUsers = ref<Participant[]>([]);
   const revealedCards = ref<UserPokerCard[]>([]);
 
@@ -59,6 +60,7 @@ export async function useGame(joinType: JoinType) {
 
       game.value = response.data.data.game as Game;
       fact.value = response.data.data.fact as string;
+      gameParticipants.value = response.data.data.participants as Participant[];
       votingUsers.value = response.data.data.votingUsers as Participant[];
       revealedCards.value = response.data.data.votes as UserPokerCard[];
 
@@ -76,10 +78,8 @@ export async function useGame(joinType: JoinType) {
 
   await getGame();
 
-  await promiseTimeout(1000);
-
   const channel = ws.join(`games.${game.value?.pin}`);
-  const { users } = useGameUsers(channel, currentUser, votingUsers);
+  const { users } = useGameUsers(channel, currentUser, gameParticipants, votingUsers);
 
   channel.listen(".game.state", ({ state }) => {
     if (game.value) {

@@ -30,12 +30,13 @@ export interface Game {
 }
 
 export interface WsUser {
-  socketId: string;
+  socketId: string | null;
   broadcastingId: string;
   userId: number;
   participantId: number | null;
   username: string;
   hasVoted: boolean;
+  kickedAt: string | null;
   joinType?: JoinType;
   connected?: boolean;
   self?: boolean;
@@ -43,7 +44,9 @@ export interface WsUser {
 
 export interface Participant {
   id: number;
+  userId: number;
   username: string;
+  kickedAt: string | null;
 }
 
 export interface UserPokerCard {

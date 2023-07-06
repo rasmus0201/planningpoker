@@ -31,7 +31,7 @@ class GameParticipantController extends Controller
      */
     public function store(Game $game, Request $request): JsonResponse
     {
-        $kickedUser = GameParticipant::onlyTrashed()
+        $kickedUser = GameParticipant::whereNotNull('kicked_at')
             ->where('game_id', $game->id)
             ->where('user_id', $this->user()->id)
             ->exists();
@@ -52,16 +52,24 @@ class GameParticipantController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
      */
-    public function destroy(Game $game, GameParticipant $gameParticipant): JsonResponse
+    public function update(Game $game, Request $request, int $gameParticipantId)
     {
         if ($this->user()->id !== $game->user_id) {
             throw new UnauthorizedException();
         }
 
-        $gameParticipant->delete();
+        $gameParticipant = GameParticipant::where('game_id', $game->id)->where('id', $gameParticipantId)->firstOrFail();
 
-        return ApiResponse::deleted();
+        $request->validate([
+            'isKicked' => ['required', 'boolean'],
+        ]);
+
+        $gameParticipant->update([
+            'kicked_at' => $request->isKicked ? now() : null,
+        ]);
+
+        return ApiResponse::success($gameParticipant);
     }
 }
