@@ -8,7 +8,7 @@ Build with Vue3.
 ## Installation & setup for production
 1. `git clone git@github.com:rasmus0201/planningpoker.git`
 2. `cd planningpoker/frontend`
-3. Create the `.env.production` file your config. `cp .env .env.production`
+3. Change the `.env.production` to match your backend needs.
 7. Setup the nginx - see in the backend readme for this.
 
 ## Development setup
