@@ -30,6 +30,8 @@ const onSubmit = async () => {
 
     const json = await response.json();
 
+    console.log(json);
+
     userStore.login(json.data);
 
     router.push({ name: "home" });
