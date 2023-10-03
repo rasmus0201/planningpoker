@@ -75,6 +75,19 @@ const onUnkick = async (user: WsUser) => {
             style="max-width: 100%; height: auto; aspect-ratio: 1/1"
           ></QrCode>
         </div>
+
+        <div>
+          <h1>Estimates</h1>
+          <pre>
+1 = Meget lille opgave - et par timer max
+2 = En halv dags tid
+3 = En dags tid
+5 = Et par dage
+8 = En uge
+13 = Mere end en uge
+20 = Et sprint</pre
+          >
+        </div>
       </div>
     </aside>
 
@@ -86,6 +99,17 @@ const onUnkick = async (user: WsUser) => {
     </section>
 
     <section v-if="gameState === 'voting'" class="column is-relative is-12-mobile is-10">
+      <div class="my-5">
+        <pre>
+1 = Meget lille opgave - et par timer max
+2 = En halv dags tid
+3 = En dags tid
+5 = Et par dage
+8 = En uge
+13 = Mere end en uge
+20 = Et sprint</pre
+        >
+      </div>
       <div class="poker-cards-container">
         <p v-if="votingUsers?.length === 0" class="title">Please vote 🙃</p>
         <TransitionGroup name="list" tag="div" class="poker-cards-container__inner">
