@@ -1,10 +1,10 @@
-import { computed, Ref } from "vue";
+import { computed, MaybeRef } from "vue";
 
 import type { Game } from "@/types";
 
 import { useApi } from "./use-api";
 
-export function useGameActions(game: Ref<Game | undefined>) {
+export function useGameActions(game: MaybeRef<Game | undefined>) {
   const api = useApi();
   const canStartGame = computed(() => game.value?.state === "lobby");
   const canContinueGame = computed(() => game.value?.state === "voting" || game.value?.state === "revealing");
