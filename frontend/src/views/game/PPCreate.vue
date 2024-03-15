@@ -13,7 +13,45 @@ const dateFormatted = new Date().toLocaleDateString("da-DK", {
   month: "2-digit",
   day: "2-digit"
 });
-const title = ref(`Planning ${dateFormatted}`);
+
+const titles = [
+  "Planning",
+  "Refinement",
+  "🥶🥶🥶",
+  "💩💩💩",
+  "👽👽👽",
+  "👻👻👻",
+  "🤖🤖🤖",
+  "👾👾👾",
+  "🤡🤡🤡",
+  "🤠🤠🤠",
+  "💪💪💪",
+  "🤟🤟🤟",
+  "🖖🖖🖖",
+  "🦄🦄🦄",
+  "🐉🐉🐉",
+  "🐲🐲🐲",
+  "🦖🦖🦖",
+  "🦕🦕🦕",
+  "🐊🐊🐊",
+  "🐍🐍🐍",
+  "🦥🦥🦥",
+  "🦦🦦🦦",
+  "🐔🐔🐔",
+  "🐓🐓🐓",
+  "🐣🐣🐣",
+  "🐤🐤🐤",
+  "🐥🐥🐥",
+  "🐦🐦🐦",
+  "🐧🐧🐧",
+  "🦆🦆🦆",
+  "🦢🦢🦢",
+  "🦉🦉🦉",
+  "🇷 🇸 🇴  🇼 🇦 🇸  🇭 🇪 🇷 🇪"
+];
+const randomTitle = titles[Math.floor(Math.random() * titles.length)];
+
+const title = ref(`${randomTitle} ${dateFormatted}`);
 
 const onCreate = async () => {
   state.value = "loading";
