@@ -15,7 +15,7 @@ export function useDashboard() {
   onMounted(async () => {
     const response = await api.get("/games");
 
-    if (response.ok) {
+    if (response.status === 200) {
       activeGames.value = response.data.filter((g: Game) => g.state !== "finished");
       hostedGames.value = response.data.filter((g: Game) => g.state === "finished" && g.userId === userStore.user.id);
     }
