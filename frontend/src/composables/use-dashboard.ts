@@ -16,8 +16,10 @@ export function useDashboard() {
     const response = await api.get("/games");
 
     if (response.status === 200) {
-      activeGames.value = response.data.filter((g: Game) => g.state !== "finished");
-      hostedGames.value = response.data.filter((g: Game) => g.state === "finished" && g.userId === userStore.user.id);
+      activeGames.value = response.data.data.filter((g: Game) => g.state !== "finished");
+      hostedGames.value = response.data.data.filter(
+        (g: Game) => g.state === "finished" && g.userId === userStore.user.id
+      );
     }
   });
 
