@@ -2,9 +2,11 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { API_URL } from "@/config";
+import { useApi } from "@/composables";
 
 const router = useRouter();
+
+const api = useApi();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 
@@ -56,19 +58,15 @@ const title = ref(`${randomTitle} ${dateFormatted}`);
 const onCreate = async () => {
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/games`, {
-      method: "POST",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ title: title.value })
-    });
+    const response = await api.post("/games", { title: title.value });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    const json = await response.json();
+    const body = response.data;
 
-    router.push({ name: "game.host", params: { pin: json.data.pin } });
+    router.push({ name: "game.host", params: { pin: body.data.pin } });
 
     state.value = "success";
   } catch (error) {

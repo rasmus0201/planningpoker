@@ -3,11 +3,13 @@ import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
 import AuthFormWrapper from "@/components/AuthFormWrapper.vue";
-import { API_URL } from "@/config";
+import { useUnauthenticatedApi } from "@/composables";
 import { useUserStore } from "@/pinia/user";
 
 const router = useRouter();
 const userStore = useUserStore();
+
+const api = useUnauthenticatedApi();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 const form = reactive({
@@ -18,22 +20,13 @@ const form = reactive({
 const onSubmit = async () => {
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify(form)
-    });
+    const response = await api.post("/auth/login", form);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    const json = await response.json();
-
-    console.log(json);
-
-    userStore.login(json.data);
-
+    userStore.login(response.data.data);
     router.push({ name: "home" });
 
     state.value = "success";

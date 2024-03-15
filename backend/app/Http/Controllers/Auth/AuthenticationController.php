@@ -14,8 +14,8 @@ class AuthenticationController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'username' => $request->username,
             'email' => $request->email,
+            'username' => User::createUsernameFromEmail($request->email),
             'password' => Hash::make($request->password),
         ]);
 
@@ -30,7 +30,7 @@ class AuthenticationController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (!auth()->attempt($credentials, true)) {
-            return ApiResponse::unauthorized('Username/password incorrect');
+            return ApiResponse::unauthorized('Email/password incorrect');
         }
 
         /** @var \App\Models\User */

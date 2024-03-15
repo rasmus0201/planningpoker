@@ -2,11 +2,13 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { API_URL } from "@/config";
+import { useApi } from "@/composables";
 import type { Game } from "@/types";
 
 const router = useRouter();
 const route = useRoute();
+
+const api = useApi();
 
 const pin = ref("");
 const joinType = ref<"play" | "spectate">("play");
@@ -40,17 +42,14 @@ const state = ref<"init" | "loading" | "success" | "error">("init");
 const onSubmit = async () => {
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/games/${pin.value}`, {
-      method: "GET",
-      headers: new Headers({ "Content-Type": "application/json" })
-    });
+    const response = await api.get(`/games/${pin.value}`);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    const json = await response.json();
-    const game = json.data.game as Game;
+    const body = response.data;
+    const game = body.data.game as Game;
 
     if (!game.pin || game.state === "finished") {
       throw new Error();

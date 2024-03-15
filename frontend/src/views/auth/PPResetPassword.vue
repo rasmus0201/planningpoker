@@ -3,9 +3,11 @@ import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
 import AuthFormWrapper from "@/components/AuthFormWrapper.vue";
-import { API_URL } from "@/config";
+import { useUnauthenticatedApi } from "@/composables";
 
 const router = useRouter();
+
+const api = useUnauthenticatedApi();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 const form = reactive({
@@ -17,21 +19,16 @@ const onSubmit = async () => {
   state.value = "loading";
 
   try {
-    const response = await fetch(`${API_URL}/auth/reset-password`, {
-      method: "POST",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify({
-        ...form,
-        token: router.currentRoute.value.query.token ?? ""
-      })
+    const response = await api.post("/auth/reset-password", {
+      ...form,
+      token: router.currentRoute.value.query.token ?? ""
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
     router.push({ name: "auth.login" });
-
     state.value = "success";
   } catch (e) {
     state.value = "error";

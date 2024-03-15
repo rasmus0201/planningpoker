@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\ApiResponse;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -30,7 +31,7 @@ class MeController extends Controller
 
         $updates = [
             'email' => $request->email,
-            'username' => $request->username,
+            'username' => User::createUsernameFromEmail($request->email),
         ];
 
         if ($request->password) {

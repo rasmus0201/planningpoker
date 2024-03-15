@@ -3,9 +3,10 @@ import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
 import AuthFormWrapper from "@/components/AuthFormWrapper.vue";
-import { API_URL } from "@/config";
+import { useUnauthenticatedApi } from "@/composables";
 
 const router = useRouter();
+const api = useUnauthenticatedApi();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 const error = ref("");
@@ -16,16 +17,13 @@ const onSubmit = async () => {
   state.value = "loading";
 
   try {
-    const response = await fetch(`${API_URL}/auth/forgot-password`, {
-      method: "POST",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ email: email.value, returnPath: router.resolve({ name: "auth.resetPassword" }).path })
+    const response = await api.post("/auth/forgot-password", {
+      email: email.value,
+      returnPath: router.resolve({ name: "auth.resetPassword" }).path
     });
 
-    const body = await response.json();
-
-    if (!response.ok) {
-      error.value = body.message ?? "Please try again";
+    if (response.status !== 200) {
+      error.value = response.data.message ?? "Please try again";
       throw new Error();
     }
 

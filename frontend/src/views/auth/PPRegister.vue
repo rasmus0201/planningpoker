@@ -3,16 +3,17 @@ import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
 import AuthFormWrapper from "@/components/AuthFormWrapper.vue";
-import { API_URL } from "@/config";
+import { useUnauthenticatedApi } from "@/composables";
 import { useUserStore } from "@/pinia/user";
 
 const router = useRouter();
 const userStore = useUserStore();
 
+const api = useUnauthenticatedApi();
+
 const state = ref<"init" | "loading" | "success" | "error">("init");
 const form = reactive({
   email: "",
-  username: "",
   password: ""
 });
 
@@ -20,20 +21,13 @@ const onSubmit = async () => {
   state.value = "loading";
 
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify(form)
-    });
+    const response = await api.post("/auth/register", form);
 
-    if (!response.ok) {
+    if (response.status !== 201) {
       throw new Error();
     }
 
-    const json = await response.json();
-
-    userStore.login(json.data);
-
+    userStore.login(response.data.data);
     router.push({ name: "home" });
 
     state.value = "success";
@@ -52,10 +46,6 @@ const onSubmit = async () => {
       <div class="column">
         <label for="email">Email</label>
         <input v-model="form.email" required class="input is-primary" type="email" placeholder="Email address" />
-      </div>
-      <div class="column">
-        <label for="Name">Username</label>
-        <input v-model="form.username" required class="input is-primary" type="text" placeholder="Username" />
       </div>
       <div class="column">
         <label for="Name">Password</label>

@@ -2,6 +2,7 @@ import axios from "axios";
 import Echo from "laravel-echo";
 
 import { useUserStore } from "@/pinia/user";
+import router from "@/router";
 
 const createApi = (headers: Record<string, string> | undefined = undefined) =>
   axios.create({
@@ -54,7 +55,10 @@ export function useApi(ws: Echo | undefined = undefined) {
     (response) => response,
     (error) => {
       if (error.response?.status === 401 && error.response?.data?.message === "Unauthenticated.") {
-        return userStore.logout();
+        userStore.logout();
+        router.push({ name: "auth.login" });
+
+        return;
       }
 
       return Promise.reject(error);

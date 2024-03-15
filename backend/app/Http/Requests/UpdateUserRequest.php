@@ -23,12 +23,6 @@ class UpdateUserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignoreModel(Auth::user()),
             ],
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users', 'username')->ignoreModel(Auth::user()),
-            ],
             'password' => [
                 'nullable',
                 'string',

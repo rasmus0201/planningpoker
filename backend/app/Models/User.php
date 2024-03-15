@@ -50,6 +50,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public static function createUsernameFromEmail(string $email): string
+    {
+        return mb_strtolower(explode('@', $email)[0]);
+    }
+
     public function getAuthIdentifierForBroadcasting(): string
     {
         if (request('join_type')) {

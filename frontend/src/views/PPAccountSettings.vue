@@ -2,11 +2,12 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { API_URL } from "@/config";
+import { useApi } from "@/composables";
 import { useUserStore } from "@/pinia/user";
 
 const router = useRouter();
 const userStore = useUserStore();
+const api = useApi();
 
 const state = ref<"init" | "loading" | "success" | "error">("init");
 const form = reactive({
@@ -18,19 +19,17 @@ const form = reactive({
 const onAccountUpdate = async () => {
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/me`, {
-      method: "PATCH",
-      headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify(form)
-    });
+    const response = await api.patch("/me", form);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    const json = await response.json();
+    const json = response.data;
     userStore.user = json.data;
 
+    form.username = userStore.user.username;
+    form.email = userStore.user.email;
     form.password = "";
 
     state.value = "success";
@@ -43,17 +42,14 @@ const exportedData = ref<string>("");
 const onExport = async () => {
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/me/export`, {
-      method: "POST"
-    });
+    const response = await api.post("/me/export");
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    const json = await response.json();
-
-    exportedData.value = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json.data, null, 2));
+    exportedData.value =
+      "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(response.data.data, null, 2));
 
     state.value = "success";
   } catch (error) {
@@ -69,15 +65,13 @@ const onErasure = async () => {
 
   state.value = "loading";
   try {
-    const response = await fetch(`${API_URL}/me`, {
-      method: "DELETE"
-    });
+    const response = await api.delete("/me");
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error();
     }
 
-    await userStore.logout();
+    // await userStore.logout();
     router.push({ name: "auth.login" });
 
     state.value = "success";
@@ -100,15 +94,15 @@ const onErasure = async () => {
               <p class="has-text-success">Changed made successfully.</p>
             </div>
             <div class="field">
-              <label class="label">Email</label>
+              <label class="label">Display name (readonly)</label>
               <div class="control">
-                <input v-model="form.email" required class="input" type="email" placeholder="e.g. alex@example.com" />
+                <input v-model="form.username" readonly disabled class="input" type="text" />
               </div>
             </div>
             <div class="field">
-              <label class="label">Username</label>
+              <label class="label">Email</label>
               <div class="control">
-                <input v-model="form.username" required class="input" type="text" placeholder="e.g. alex@example.com" />
+                <input v-model="form.email" required class="input" type="email" placeholder="e.g. alex@example.com" />
               </div>
             </div>
             <div class="field">
