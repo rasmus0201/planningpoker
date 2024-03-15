@@ -6,7 +6,7 @@ import PokerCard from "@/components/PokerCard.vue";
 import PokerCardBack from "@/components/PokerCardBack.vue";
 import { useGame } from "@/composables";
 
-const { fact, game, gameState, revealedCards, votingUsers, users } = await useGame("spectate");
+const { game, gameState, gif, revealedCards, votingUsers, users } = await useGame("spectate");
 </script>
 
 <template>
@@ -20,7 +20,9 @@ const { fact, game, gameState, revealedCards, votingUsers, users } = await useGa
     </aside>
 
     <section v-if="gameState === 'lobby'" class="column is-12-mobile is-10">
-      <h1 class="title p-4">Random fact: {{ fact }}</h1>
+      <div class="py-4">
+        <img :src="gif" alt="random gif" />
+      </div>
     </section>
 
     <section v-if="gameState === 'voting'" class="column is-relative is-12-mobile is-10">
@@ -39,7 +41,7 @@ const { fact, game, gameState, revealedCards, votingUsers, users } = await useGa
 
     <section v-if="gameState === 'finished'" class="column is-relative is-12-mobile is-10">
       <div class="p-4">
-        <p class="title">Game finished 🙃</p>
+        <p class="title">Game finished 🚀</p>
         <RouterLink :to="{ name: 'home' }">Home</RouterLink>
       </div>
     </section>

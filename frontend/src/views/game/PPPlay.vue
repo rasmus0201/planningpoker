@@ -8,7 +8,7 @@ import PokerCardWritable from "@/components/PokerCardWritable.vue";
 import { useApi, useGame } from "@/composables";
 import { PokerCards } from "@/types";
 
-const { fact, game, gameState, revealedCards, users, ws, channel } = await useGame("play");
+const { game, gameState, gif, revealedCards, users, ws, channel } = await useGame("play");
 const api = useApi(ws);
 
 const hasVoted = ref(false);
@@ -56,7 +56,9 @@ channel.listen(".game.new-round", () => {
     </aside>
 
     <section v-if="gameState === 'lobby'" class="column is-12-mobile is-10">
-      <h1 class="title p-4">Random fact: {{ fact }}</h1>
+      <div class="py-4">
+        <img :src="gif" alt="random gif" />
+      </div>
     </section>
 
     <section v-if="gameState === 'voting'" class="column is-12-mobile is-10">
@@ -83,7 +85,7 @@ channel.listen(".game.new-round", () => {
 
     <section v-if="gameState === 'finished'" class="column is-relative is-12-mobile is-10">
       <div class="p-4">
-        <p class="title">Game finished 🙃</p>
+        <p class="title">Game finished 🚀</p>
         <RouterLink :to="{ name: 'home' }">Home</RouterLink>
       </div>
     </section>

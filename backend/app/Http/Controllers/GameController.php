@@ -8,7 +8,7 @@ use App\Http\ApiResponse;
 use App\Http\Requests\{StoreGameRequest, UpdateGameRequest};
 use App\Http\Resources\{GameParticipantResource, GameResource, GameVoteResource};
 use App\Models\{Game, GameVote};
-use App\Services\RandomFactService;
+use App\Services\RandomGifService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
@@ -47,11 +47,11 @@ class GameController extends Controller
      */
     public function show(Game $game, Request $request)
     {
-        $rf = new RandomFactService();
+        $rg = new RandomGifService();
 
         $data = [
             'game' => new GameResource($game),
-            'fact' => $game->state === GameState::Lobby ? $rf->get() : '',
+            'gif' => $game->state === GameState::Lobby ? $rg->get() : '',
             'participants' => GameParticipantResource::collection(
                 $game->participants()->with('user')->get()
             )->toArray($request),

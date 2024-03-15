@@ -129,7 +129,7 @@ const onUnkick = async (user: WsUser) => {
 
     <section v-if="gameState === 'finished'" class="column is-relative is-12-mobile is-10">
       <div class="p-4">
-        <p class="title">Game finished 🙃</p>
+        <p class="title">Game finished 🚀</p>
         <RouterLink :to="{ name: 'home' }">Home</RouterLink>
       </div>
     </section>

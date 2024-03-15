@@ -27,9 +27,8 @@ export async function useGame(joinType: JoinType) {
     hasVoted: false
   };
 
-  const fact = ref<string>("");
-
   const game = ref<Game | undefined>();
+  const gif = ref<string | undefined>();
   const gameState = computed(() => game.value?.state ?? "initial");
   const gameJoinUrl = computed(
     () =>
@@ -59,7 +58,7 @@ export async function useGame(joinType: JoinType) {
       const response = await api.get(`/games/${route.params.pin}`);
 
       game.value = response.data.data.game as Game;
-      fact.value = response.data.data.fact as string;
+      gif.value = response.data.data.gif as string;
       gameParticipants.value = response.data.data.participants as Participant[];
       votingUsers.value = response.data.data.votingUsers as Participant[];
       revealedCards.value = response.data.data.votes as UserPokerCard[];
@@ -102,10 +101,10 @@ export async function useGame(joinType: JoinType) {
   });
 
   return {
-    fact,
     game,
     gameState,
     gameJoinUrl,
+    gif,
     users,
 
     votingUsers,
