@@ -1,7 +1,8 @@
 import { cloneDeep } from "lodash-es";
 import { defineStore } from "pinia";
+import { computed, reactive, toRefs } from "vue";
 
-import { API_URL } from "@/config";
+import { useApi } from "@/composables";
 
 interface User {
   id: number;
@@ -19,26 +20,32 @@ const defaultState = {
   } as User
 };
 
-export const useUserStore = defineStore("user", {
-  state: () => cloneDeep(defaultState),
-  getters: {
-    isLoggedIn(store) {
-      return Boolean(store?.user?.id);
-    }
-  },
-  actions: {
-    login(user: User) {
-      this.user = user;
-    },
-    async logout() {
-      await fetch(`${API_URL}/auth/logout`, {
-        method: "POST",
-        headers: new Headers({ "Content-Type": "application/json" }),
-        credentials: "include"
-      });
+export const useUserStore = defineStore(
+  "user",
+  () => {
+    const api = useApi();
+    const state = reactive<typeof defaultState>(cloneDeep(defaultState));
 
-      this.$patch(cloneDeep(defaultState));
-    }
+    const isLoggedIn = computed(() => Boolean(state.user.id));
+
+    const login = (user: User) => {
+      state.user = user;
+    };
+
+    const logout = async () => {
+      await api.post("/auth/logout");
+
+      Object.assign(state, cloneDeep(defaultState));
+    };
+
+    return {
+      ...toRefs(state),
+      isLoggedIn,
+      login,
+      logout
+    };
   },
-  persist: true
-});
+  {
+    persist: true
+  }
+);

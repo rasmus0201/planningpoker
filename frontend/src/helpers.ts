@@ -1,6 +1,6 @@
 import Color from "color";
 
-import { JoinType } from "@/types";
+import type { JoinType } from "@/types";
 
 export const darkenColor = (color: string) => Color(color).darken(0.5).hex();
 export const dynamicForeground = (color: string) => (Color(color).isDark() ? "#fff" : "#000");

@@ -7,7 +7,7 @@ import JoinedUsers from "@/components/JoinedUsers.vue";
 import PokerCard from "@/components/PokerCard.vue";
 import PokerCardBack from "@/components/PokerCardBack.vue";
 import { useApi, useGame, useGameActions } from "@/composables";
-import { WsUser } from "@/types";
+import type { WsUser } from "@/types";
 
 const { game, gameState, gameJoinUrl, users, votingUsers, revealedCards, ws } = await useGame("host");
 const api = useApi(ws);

@@ -20,18 +20,12 @@ module.exports = {
   ],
   rules: {
     "@typescript-eslint/array-type": ["warn", { default: "array" }],
-    "@typescript-eslint/no-duplicate-imports": ["warn"],
     "@typescript-eslint/no-shadow": "warn",
     "arrow-body-style": ["warn", "as-needed"],
-    "no-duplicate-imports": "off",
     "no-restricted-imports": [
       "warn",
       {
         patterns: [
-          {
-            group: ["@/lemma-dsk/*"],
-            message: "Use @dsk/* instead."
-          },
           {
             group: ["../*"],
             message: "You should avoid imports using relative paths. Use @/* instead."

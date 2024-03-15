@@ -1,9 +1,9 @@
 import Echo from "laravel-echo";
-import Pusher, { Options } from "pusher-js";
+import Pusher, { type Options } from "pusher-js";
 import { computed } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
-import { JoinType } from "@/types";
+import type { JoinType } from "@/types";
 
 let ECHO_INSTANCE: Echo | null = null;
 

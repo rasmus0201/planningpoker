@@ -1,9 +1,8 @@
-import { MaybeRef } from "@vueuse/core";
-import { PresenceChannel } from "laravel-echo";
+import type { PresenceChannel } from "laravel-echo";
 import { orderBy } from "lodash-es";
-import { computed, ref, unref } from "vue";
+import { computed, type MaybeRef, ref, unref } from "vue";
 
-import { GameStateType, Participant, WsUser } from "@/types";
+import type { GameStateType, Participant, WsUser } from "@/types";
 
 export function useGameUsers(
   channel: PresenceChannel,

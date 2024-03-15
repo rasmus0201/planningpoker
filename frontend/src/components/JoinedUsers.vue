@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { mapJoinType } from "@/helpers";
-import { GameStateType, WsUser } from "@/types";
+import type { GameStateType, WsUser } from "@/types";
 
 const props = defineProps<{
   users: WsUser[];

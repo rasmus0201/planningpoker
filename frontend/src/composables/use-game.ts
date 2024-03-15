@@ -2,7 +2,7 @@ import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useUserStore } from "@/pinia/user";
-import type { Game, JoinType, Participant, UserPokerCard, WsUser } from "@/types";
+import type { Game, GameStateType, JoinType, Participant, UserPokerCard, WsUser } from "@/types";
 
 import { useApi } from "./use-api";
 import { useGameUsers } from "./use-game-users";
@@ -80,7 +80,7 @@ export async function useGame(joinType: JoinType) {
   const channel = ws.join(`games.${game.value?.pin}`);
   const { users } = useGameUsers(channel, currentUser, gameParticipants, votingUsers);
 
-  channel.listen(".game.state", ({ state }) => {
+  channel.listen(".game.state", ({ state }: { state: GameStateType }) => {
     if (game.value) {
       game.value.state = state;
     }

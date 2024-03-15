@@ -41,7 +41,10 @@ const isCustomCard = computed(() => !(PokerCards as readonly string[]).includes(
   background: #fff;
   border: 1px solid #000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;
 }
 
