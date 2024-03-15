@@ -6,7 +6,7 @@ import { useUserStore } from "@/pinia/user";
 
 const userStore = useUserStore();
 
-const { activeGames, hostedGames } = useDashboard();
+const { activeGames, hostedGames, finishGame } = useDashboard();
 </script>
 
 <template>
@@ -40,7 +40,7 @@ const { activeGames, hostedGames } = useDashboard();
           </RouterLink>
         </div>
         <div>
-          <button class="button is-warning">End game</button>
+          <button class="button is-warning" @click="finishGame(game)">End game</button>
         </div>
       </div>
     </div>

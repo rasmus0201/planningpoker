@@ -4,6 +4,8 @@ import { API_URL } from "@/config";
 import { useUserStore } from "@/pinia/user";
 import type { Game } from "@/types";
 
+import { useGameActions } from "./use-game-actions";
+
 export function useDashboard() {
   const userStore = useUserStore();
 
@@ -23,8 +25,17 @@ export function useDashboard() {
     }
   });
 
+  const finishGame = async (game: Game) => {
+    const gameActions = useGameActions(game);
+    await gameActions.onFinishGame(game);
+
+    activeGames.value = activeGames.value.filter((g) => g.id !== game.id);
+    hostedGames.value = [game, ...hostedGames.value];
+  };
+
   return {
     activeGames,
-    hostedGames
+    hostedGames,
+    finishGame
   };
 }
