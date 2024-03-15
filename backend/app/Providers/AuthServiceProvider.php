@@ -23,8 +23,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        ResetPassword::$createUrlCallback = function ($notifiable, $token) {
+        ResetPassword::createUrlUsing(function ($notifiable, $token) {
             return config('app.url') . '/reset-password?token=' . $token;
-        };
+        });
     }
 }
