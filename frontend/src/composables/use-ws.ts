@@ -18,7 +18,6 @@ export function useWs(joinType: JoinType | undefined = undefined) {
     broadcaster: "pusher",
     cluster: import.meta.env.VITE_PUSHER_CLUSTER,
     encrypted: true,
-    disableStats: false,
     enabledTransports: ["ws", "wss"],
     authEndpoint: import.meta.env.VITE_PUSHER_AUTH_ENDPOINT,
     auth: {
