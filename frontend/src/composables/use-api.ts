@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 import Echo from "laravel-echo";
 
 import { useUserStore } from "@/pinia/user";
@@ -9,7 +8,6 @@ const createApi = (headers: Record<string, string> | undefined = undefined) =>
   axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
-      "X-CSRF-TOKEN": Cookies.get("XSRF-TOKEN"),
       "Content-Type": "application/json",
       Accept: "application/json",
       ...headers
