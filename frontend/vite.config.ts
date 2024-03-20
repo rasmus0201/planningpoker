@@ -1,10 +1,10 @@
+import eslint from "@nabla/vite-plugin-eslint";
 import vue from "@vitejs/plugin-vue";
 import { readFileSync } from "fs";
 import os from "os";
 import { resolve } from "path";
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
-import eslint from "vite-plugin-eslint";
 import mkcert from "vite-plugin-mkcert";
 
 // https://vitejs.dev/config/
