@@ -66,7 +66,7 @@ class ApiResponse
 
     private static function response(
         ?string $message,
-        mixed $data = null,
+        mixed $data,
         int $statusCode
     ): JsonResponse {
         // Make sure there is 1 and only 1 data key in response.
