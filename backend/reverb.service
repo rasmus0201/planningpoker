@@ -1,3 +1,7 @@
+[Install]
+Alias=reverb.service
+WantedBy=multi-user.target
+
 [Unit]
 Description=Reverb service to control websocket server for agile-tools.dk
 Conflicts=shutdown.target
@@ -8,6 +12,3 @@ ExecStart=/usr/bin/php artisan reverb:start
 WorkingDirectory=/srv/sites/agile-tools.dk/backend
 Restart=on-failure
 RestartSec=20
-
-[Install]
-WantedBy=multi-user.target
