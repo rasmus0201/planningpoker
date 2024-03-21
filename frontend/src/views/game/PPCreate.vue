@@ -59,11 +59,6 @@ const onCreate = async () => {
   state.value = "loading";
   try {
     const response = await api.post("/games", { title: title.value });
-
-    if (response.status !== 200) {
-      throw new Error();
-    }
-
     const body = response.data;
 
     router.push({ name: "game.host", params: { pin: body.data.pin } });

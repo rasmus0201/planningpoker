@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isAxiosError } from "axios";
 import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
@@ -17,21 +18,29 @@ const form = reactive({
   password: ""
 });
 
+const defaultErrors = {
+  email: [],
+  password: []
+};
+const errors = reactive<Record<string, string[]>>({ ...defaultErrors });
+
 const onSubmit = async () => {
   state.value = "loading";
+  Object.assign(errors, { ...defaultErrors });
 
   try {
     const response = await api.post("/auth/register", form);
-
-    if (response.status !== 201) {
-      throw new Error();
-    }
 
     userStore.login(response.data.data);
     router.push({ name: "home" });
 
     state.value = "success";
-  } catch (error) {
+  } catch (e) {
+    if (isAxiosError(e) && e.response?.status === 400) {
+      errors.email = e.response.data.data.errors.email || [];
+      errors.password = e.response.data.data.errors.password || [];
+    }
+
     state.value = "error";
   }
 };
@@ -41,7 +50,9 @@ const onSubmit = async () => {
   <AuthFormWrapper :disabled="state === 'loading'" @submit="onSubmit()">
     <div class="columns w-100 is-flex is-flex-direction-column box">
       <div v-if="state === 'error'" class="column">
-        <p class="has-text-danger">Please try again.</p>
+        <ul>
+          <li v-for="(error, index) in Object.values(errors)" :key="index" class="has-text-danger">{{ error[0] }}</li>
+        </ul>
       </div>
       <div class="column">
         <label for="email">Email</label>

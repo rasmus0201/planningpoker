@@ -21,10 +21,6 @@ const onAccountUpdate = async () => {
   try {
     const response = await api.patch("/me", form);
 
-    if (response.status !== 200) {
-      throw new Error();
-    }
-
     const json = response.data;
     userStore.user = json.data;
 
@@ -44,10 +40,6 @@ const onExport = async () => {
   try {
     const response = await api.post("/me/export");
 
-    if (response.status !== 200) {
-      throw new Error();
-    }
-
     exportedData.value =
       "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(response.data.data, null, 2));
 
@@ -65,11 +57,7 @@ const onErasure = async () => {
 
   state.value = "loading";
   try {
-    const response = await api.delete("/me");
-
-    if (response.status !== 200) {
-      throw new Error();
-    }
+    await api.delete("/me");
 
     // await userStore.logout();
     router.push({ name: "auth.login" });
