@@ -49,7 +49,7 @@ const showConfetti = ref(false);
 watch(
   () => revealedCards.value,
   (cards) => {
-    if (gameState.value !== "revealing" || cards.length <= 0) {
+    if (gameState.value !== "revealing" || cards.length <= 1) {
       showConfetti.value = false;
       return;
     }
