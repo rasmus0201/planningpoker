@@ -10,6 +10,12 @@ export declare global {
     readonly VITE_PUSHER_CLUSTER: string;
     readonly VITE_PUSHER_KEY: string;
     readonly VITE_PUSHER_AUTH_ENDPOINT: string;
+
+    readonly VITE_REVERB_APP_KEY: string;
+    readonly VITE_REVERB_HOST: string;
+    readonly VITE_REVERB_PORT: string;
+    readonly VITE_REVERB_SCHEME: string;
+    readonly VITE_REVERB_AUTH_ENDPOINT: string;
   }
 
   interface ImportMeta {

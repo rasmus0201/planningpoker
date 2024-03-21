@@ -28,12 +28,12 @@ const page = ref<"privacy" | "cookie">("privacy");
             Vi er dataansvarlig for behandlingen af de personoplysninger, som vi behandler om vores kunder og
             samarbejdspartnere. Du finder vores kontaktoplysninger nedenfor.
             <br /><br />
-            <span>Rasmus Bundsgaard Sørensen</span>
+            <span>Ordbogen A/S</span>
             <br />
-            <span>bundsgaard [dot] rasmus [snabel-a] gmail [dot] com</span>
+            <span>support [snabel-a] ordbogen [dot] com</span>
             <br /><br />
-            Hvis du har spørgsmål til behandlingen af dine personoplysninger, så kan du kontakte os via bundsgaard [dot]
-            rasmus [snabel-a] gmail [dot] com.
+            Hvis du har spørgsmål til behandlingen af dine personoplysninger, så kan du kontakte os via ovenstående
+            email.
           </p>
 
           <h3 class="is-size-3">Behandlingsaktiviteter</h3>
@@ -70,12 +70,8 @@ const page = ref<"privacy" | "cookie">("privacy");
           </p>
           <p>
             Eksterne leverandører kan eksempelvis levere systemer til at organisere vores arbejde, services, rådgivning,
-            IT-hosting eller markedsføring.
+            IT-hosting eller markedsføring, el.l.
           </p>
-          <ul>
-            <li>Digital Ocean (frankfurt)</li>
-            <li>Mailgun</li>
-          </ul>
           <p>
             Det er vores ansvar at sikre, at dine personoplysninger behandles ordentligt. Derfor stiller vi høje krav
             til vores samarbejdspartnere, og vores partnere skal garantere, at dine personoplysninger er beskyttet.

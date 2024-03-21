@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isAxiosError } from "axios";
 import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
@@ -17,18 +18,17 @@ const onSubmit = async () => {
   state.value = "loading";
 
   try {
-    const response = await api.post("/auth/forgot-password", {
+    await api.post("/auth/forgot-password", {
       email: email.value,
       returnPath: router.resolve({ name: "auth.resetPassword" }).path
     });
 
-    if (response.status !== 200) {
-      error.value = response.data.message ?? "Please try again";
-      throw new Error();
-    }
-
     state.value = "success";
   } catch (e) {
+    if (isAxiosError(e) && e.response?.status === 400) {
+      error.value = e.response.data.data?.errors?.email[0] ?? e.response.data.message ?? "Please try again";
+    }
+
     state.value = "error";
   }
 };

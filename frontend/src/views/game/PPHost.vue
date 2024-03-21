@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import QrCode from "@chenfengyuan/vue-qrcode";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 
 import JoinedUsers from "@/components/JoinedUsers.vue";
 import PokerCard from "@/components/PokerCard.vue";
 import PokerCardBack from "@/components/PokerCardBack.vue";
+import PokerConfetti from "@/components/PokerConfetti.vue";
 import { useApi, useGame, useGameActions } from "@/composables";
 import type { WsUser } from "@/types";
 
@@ -43,6 +44,30 @@ const onUnkick = async (user: WsUser) => {
     // Noop
   }
 };
+
+const showConfetti = ref(false);
+watch(
+  () => revealedCards.value,
+  (cards) => {
+    if (gameState.value !== "revealing" || cards.length <= 0) {
+      showConfetti.value = false;
+      return;
+    }
+
+    if (!cards.every((card) => card.vote === cards[0].vote)) {
+      showConfetti.value = false;
+      return;
+    }
+
+    // Only 25% probability to show confetti
+    if (Math.random() > 0.25) {
+      showConfetti.value = false;
+      return;
+    }
+
+    showConfetti.value = true;
+  }
+);
 </script>
 
 <template>
@@ -133,6 +158,8 @@ const onUnkick = async (user: WsUser) => {
         <RouterLink :to="{ name: 'home' }">Home</RouterLink>
       </div>
     </section>
+
+    <PokerConfetti v-if="showConfetti" />
   </div>
 </template>
 

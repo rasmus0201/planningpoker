@@ -44,10 +44,6 @@ const onSubmit = async () => {
   try {
     const response = await api.get(`/games/${pin.value}`);
 
-    if (response.status !== 200) {
-      throw new Error();
-    }
-
     const body = response.data;
     const game = body.data.game as Game;
 

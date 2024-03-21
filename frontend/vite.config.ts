@@ -30,6 +30,11 @@ export default defineConfig(({ command }) => {
         "/api": {
           target: "http://127.0.0.1:8000",
           changeOrigin: true,
+          secure: false
+        },
+        "/app": {
+          target: "http://127.0.0.1:8080",
+          changeOrigin: true,
           secure: false,
           ws: true
         }

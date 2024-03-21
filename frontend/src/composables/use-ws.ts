@@ -15,11 +15,15 @@ export function useWs(joinType: JoinType | undefined = undefined) {
   }
 
   const options = {
-    broadcaster: "pusher",
-    cluster: import.meta.env.VITE_PUSHER_CLUSTER,
+    broadcaster: "reverb",
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: parseInt(import.meta.env.VITE_REVERB_PORT ?? "80"),
+    wssPort: parseInt(import.meta.env.VITE_REVERB_PORT ?? "443"),
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
+    cluster: "",
     encrypted: true,
     enabledTransports: ["ws", "wss"],
-    authEndpoint: import.meta.env.VITE_PUSHER_AUTH_ENDPOINT,
+    authEndpoint: import.meta.env.VITE_REVERB_AUTH_ENDPOINT,
     auth: {
       withCredentials: true,
       headers: {},
@@ -31,7 +35,8 @@ export function useWs(joinType: JoinType | undefined = undefined) {
 
   ECHO_INSTANCE = new Echo({
     ...options,
-    client: new Pusher(import.meta.env.VITE_PUSHER_KEY, options)
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    client: new Pusher(import.meta.env.VITE_REVERB_APP_KEY, options)
   });
 
   onBeforeRouteLeave(() => {
