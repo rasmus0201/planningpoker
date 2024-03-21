@@ -16,4 +16,4 @@ Build with Vue3.
 2. `cd planningpoker/frontend`
 3. `npm i`
 4. `npm run dev`
-5. When done remember to push production assets - `npm run production`
+5. When done remember to push production assets - `npm run build`

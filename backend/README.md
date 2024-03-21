@@ -15,7 +15,7 @@ Build with Laravel.
 4. Edit `.env` to match correct variables on your system. Also set APP_ENV to `production`.
 5. `php artisan migrate:fresh`
 6. Setup the nginx config for the site using the blueprint file `nginx-site.conf` in the root of the config. The site also needs a TLS-cert, so use certbot for this.
-7. Make a symlink in `/etc/systemd/system/` to the `reverb.service` file. Afterwards enable and run it: `systemctl daemon-reload && systemctl start reverb.service && systemctl enable reverb.service`
+7. Make a symlink in `/etc/systemd/system/` to the `reverb.service` file. Afterwards enable and run it: `systemctl daemon-reload && systemctl enable reverb.service && systemctl start reverb.service`
 
 
 ## Development setup
