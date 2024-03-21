@@ -31,15 +31,9 @@ return [
         'reverb' => [
             'host' => env('REVERB_SERVER_HOST', '0.0.0.0'),
             'port' => env('REVERB_SERVER_PORT', 8080),
-            'hostname' => env('REVERB_HOST'),
+            'hostname' => env('REVERB_HOSTNAME', 'localhost'),
             'options' => [
-                'tls' => env('REVERB_LOCAL_CERT') ? [
-                    'local_cert' => env('REVERB_LOCAL_CERT'),
-                    'local_pk' => env('REVERB_LOCAL_PK'),
-                    // 'passphrase' => env('REVERB_CERT_PASSPHRASE', null),
-                    // 'verify_peer' => env('APP_ENV') === 'production',
-                    // 'allow_self_signed' => env('APP_ENV') !== 'production',
-                ] : [],
+                'tls' => [],
             ],
             'max_request_size' => env('REVERB_MAX_REQUEST_SIZE', 10_000),
             'scaling' => [

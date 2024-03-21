@@ -23,3 +23,4 @@ Build with Laravel.
 2. `cd planningpoker/backend`
 3. `composer install`
 4. `php artisan serve`
+5. In another terminal run: `php artisan reverb:start --host=0.0.0.0 --port=8080 --hostname=localhost` for the local WS server.
